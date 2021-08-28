@@ -8,7 +8,7 @@ If you haven't already, clone this repository:
 git clone git@github.com:ErniesProjects/septic_monitor.git
 ```
 
-Create a Python virtual environment (only if you haven't already):
+Create a Python virtual environment (only if you haven't already).  Note - your venv does *not* get pushed to github, it is local only.
 
 ```
 cd septic_monitor                                         # we want to be in the root of the repo, where this README.md is
