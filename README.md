@@ -12,10 +12,11 @@ Create a Python virtual environment (only if you haven't already).  Note - your 
 
 ```
 cd septic_monitor                                         # we want to be in the root of the repo, where this README.md is
-sudo apt update											  # update package info
-sudo apt install python3-smbus							  # install python3-smbus from package repository
+sudo apt update                                           # update package info
+sudo apt install python3-venv python3-smbus               # install python3-smbus from package repository
 python3 -m venv --system-site-packages venv               # this creates a venv directory, again - only do this once!
-python3 -m pip install pip setuptools wheel --upgrade     # upgrade some essential packages in the ven
+source venv/bin/activate                                  # activate the venv
+python -m pip install pip setuptools wheel --upgrade      # upgrade some essential packages in the venv
 ```
 
 Cloning the repo and creating the venv only need to be done once.  Now, every time you want to work on the project, simply cd into the repository directory (with the README.md file) and activate the venv:
