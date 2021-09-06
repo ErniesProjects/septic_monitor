@@ -1,6 +1,8 @@
 import RPi.GPIO as GPIO
 import time
 
+from RPLCD.i2c import CharLCD
+
 # Test comment
 # Import sleep library
 from time import sleep
@@ -21,7 +23,7 @@ i2c_expander = "PCF8574"
 address = 0x27
 port = 1  # 0 on an older Raspberry Pi
 # Initialise the LCD
-lcd = i2c.CharLCD(
+lcd = CharLCD(
     i2c_expander, address, port=port, charmap=charmap, cols=cols, rows=rows
 )
 # Clear the LCD screen
