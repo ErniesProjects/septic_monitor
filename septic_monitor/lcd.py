@@ -1,33 +1,27 @@
-import RPi.GPIO as GPIO
 import time
 
 from RPLCD.i2c import CharLCD
 
-# Test comment
-# Import sleep library
+
 from time import sleep
 
-GPIO.setwarnings(False)  # Ignore warning for now
-GPIO.setmode(GPIO.BCM)  # Use Broadcom channel numbering
-PIN_TRIGGER = 14
-PIN_ECHO = 15
-GPIO.setup(PIN_TRIGGER, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(PIN_ECHO, GPIO.IN)
-# constants to initialise the LCD
-lcdmode = "i2c"
-cols = 20
-rows = 4
-charmap = "A00"
-i2c_expander = "PCF8574"
-# Generally 27 is the address;Find yours using: i2cdetect -y 1
-address = 0x27
-port = 1  # 0 on an older Raspberry Pi
-# Initialise the LCD
-lcd = CharLCD(
-    i2c_expander, address, port=port, charmap=charmap, cols=cols, rows=rows
+LCD = CharLCD(
+    i2c_expander="PCF8574",
+    address=0x27,  # i2cdetect -y 1
+    port=1,
+    charmap="A00",
+    cols=20,
+    rows=4
 )
-# Clear the LCD screen
-lcd.clear()
+
+
+LCD.clear()
+
+class Cursor:
+    time = (3, 0)
+    date = (3, 10)
+    distance = (2, 0)
+    
 # Write a string on first line and move to next line
 lcd.cursor_pos = (0, 0)
 lcd.write_string("POWER OK")
@@ -39,7 +33,7 @@ lcd.cursor_pos = (1, 12)
 lcd.write_string("Ip= 0.0A")
 sleep(5)
 while True:
-    lcd.cursor_pos = (3, 0)
+    lcd.cursor_pos = Cursor.time
     lcd.write_string(time.strftime("%H:%M:%S"))
 
     lcd.cursor_pos = (3, 10)
@@ -61,7 +55,7 @@ while True:
 
     Udist = str(distance)
 
-    lcd.cursor_pos = (2, 0)
+    lcd.cursor_pos = 
     lcd.write_string("Distance: ")
     lcd.write_string(Udist)
     lcd.write_string(" cm ")

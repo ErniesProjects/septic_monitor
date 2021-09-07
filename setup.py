@@ -1,8 +1,11 @@
 from setuptools import setup, find_packages
 
 install_requires = [
+    "attrs",
+    "docker-compose",
+    "redistimeseries",
     "RPi.GPIO",
-    "RPLCD",
+    "RPLCD",    
 ]
 
 setup(

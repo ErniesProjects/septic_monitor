@@ -1,0 +1,14 @@
+FROM redis:6
+
+RUN apt update && apt-get -y install git build-essential
+
+WORKDIR /usr/share
+
+RUN git clone --recursive https://github.com/RedisTimeSeries/RedisTimeSeries.git && \
+    cd RedisTimeSeries && make setup && make build
+
+RUN pwd && ls -l
+
+WORKDIR /data
+
+CMD ["redis-server", "--loadmodule", "/usr/share/RedisTimeSeries/bin/redistimeseries.so"]
