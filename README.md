@@ -62,6 +62,20 @@ If you want to work on your project with Thonny, simply launch it from the menu 
 
 ### Replication
 
+Local:
+
 ```
-ssh -nNT -R 9999:127.0.0.1:6379 <remote-host>  # FIXME, systemd
+ssh -nNT -R 9999:172.18.0.1:6379 user@192.168.2.12
+```
+
+Remote:
+
+```
+# sshd_config
+AllowTcpForwarding yes
+GatewayPorts yes
+
+# redis.conf
+replicaof 172.18.0.1 9999
+replica-announce-ip 192.168.2.12
 ```
