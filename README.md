@@ -58,3 +58,10 @@ If you add additional dependencies in `setup.py`, simply run the `python3 -m pip
 If you want to work on your project with Thonny, simply launch it from the menu and open main.py.  You'll have to configure Thonny to use Python from the venv you created:
 
 `Tools -> Options -> Interpreter Tab` then select `Alternative Python 3 interpreter or virtual environment` in the drop-down menu and press `Locate another python executable`.  Use the file browser to find the `venv/bin/python3` file from the root of your repository.  You'll only need to set this up once.
+
+
+### Replication
+
+```
+ssh -nNT -R 9999:127.0.0.1:6379 <remote-host>  # FIXME, systemd
+```

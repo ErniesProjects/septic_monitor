@@ -26,7 +26,7 @@ MIN_DIST = int(REDIS.get(Keys.min_dist)) if REDIS.exists(Keys.min_dist) else Non
 
 
 try:
-    RTS.create(Keys.dist, retention_msecs=RETENTION_DAYS*MS_IN_DAY)
+    RTS.create(Keys.dist, retention_msecs=RETENTION_DAYS*MS_IN_DAY, duplicate_policy="last")
 except Exception as e:
     if "key already exists" not in str(e):
         logger.error("Something went wrong: %s", e)
@@ -57,11 +57,15 @@ def set_dist_poll_int(minutes):
     REDIS.set(Keys.dist_poll_int, minutes)
 
 
-def set_distance(distance):
+def set_distance(distance, ts=None):
     """
     Sets the distance in the db at the current time
     """
-    RTS.add(Keys.dist, int(datetime.now().timestamp()), float(distance))
+    RTS.add(
+        Keys.dist,
+        int(ts.timestamp()) if ts else int(datetime.now().timestamp()),
+        float(distance)
+    )
     logger.info("Set distance: %s cm", distance)
 
 

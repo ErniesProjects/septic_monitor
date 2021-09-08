@@ -11,4 +11,4 @@ RUN pwd && ls -l
 
 WORKDIR /data
 
-CMD ["redis-server", "--loadmodule", "/usr/share/RedisTimeSeries/bin/redistimeseries.so"]
+CMD ["redis-server", "/etc/redis.conf"]
