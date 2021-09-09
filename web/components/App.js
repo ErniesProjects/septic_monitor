@@ -1,19 +1,21 @@
 import DistGuage from './DistGuage.js';
 
 export default {
-  name: 'App',
-  template: `
-    <div>
-      {{ message }}
-    </div>
-    <DistGuage></DistGuage>
-  `,
-  components: {
-    DistGuage,
-  },
-  data() {
-    return {
-      message: "HELLO",
-    };
-  },
+    name: 'App',
+    template: `
+        <v-container>
+            <div>
+                {{ message }}
+            </div>
+            <DistGuage></DistGuage>
+        </v-container>
+    `,
+    components: {
+        DistGuage,
+    },
+    data() {
+        return {
+            message: "HELLO",
+        };
+    },
 };
