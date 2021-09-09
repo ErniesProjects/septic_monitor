@@ -1,5 +1,5 @@
 export default {
-  name: 'AmpGuage',
+  name: 'AmpGauge',
   template: `
     <div>
         <canvas id="amp-gauge"></canvas>

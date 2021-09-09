@@ -1,8 +1,5 @@
-//import Vue from 'vue';
-//import Vuetify from 'vuetify';
-
-import DistGuage from './components/DistGuage.js';
-import AmpGuage from './components/AmpGuage.js';
+import DistGauge from './components/DistGauge.js';
+import AmpGauge from './components/AmpGauge.js';
 
 Vue.use(Vuetify);
 
@@ -17,16 +14,16 @@ new Vue({
                     {{ message }}
                 </div>
                 <v-row>
-                    <v-col><DistGuage></DistGuage></v-col>
-                    <v-col><AmpGuage></AmpGuage></v-col>
+                    <v-col><DistGauge></DistGauge></v-col>
+                    <v-col><AmpGauge></AmpGauge></v-col>
                 </v-row>
             </v-container>
           </v-main>
         </v-app>
     `,
     components: {
-        AmpGuage,
-        DistGuage,
+        AmpGauge,
+        DistGauge,
     },
     data() {
         return {

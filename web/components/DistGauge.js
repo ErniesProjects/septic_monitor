@@ -1,5 +1,5 @@
 export default {
-      name: 'DistGuage',
+      name: 'DistGauge',
       template: `
         <div>
             <div class="text-center">Dist: {{ distance }} cm</div>
