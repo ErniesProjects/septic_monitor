@@ -7,20 +7,45 @@ export default {
         </div>
       `,
       data: () => ({
-            max_distance: 20,
-            distance: 15,
+            maxDistance: 40,  // FIXME
+            minDistance: 30,  // FIXME
+            distance: null,
             chart: null,
             refresh_interval: 2000,
+            colorBg: "rgb(54, 162, 235)",
+            colorOk: "rgb(40, 167, 69)",
+            colorWarn: "rgb(220, 53, 69)",
       }),
-      mounted() {
+      methods: {
+          async getDistance() {
+              const r = await axios.get('/api/distance/');
+              return r.data.value;  // FIXME
+          },
+          async update() {
+              var dist = await this.getDistance();
+              this.chart.data.datasets[0].data.pop();
+              this.chart.data.datasets[0].data.pop();
+              this.chart.data.datasets[0].data.push(dist);
+              this.chart.data.datasets[0].data.push(this.maxDistance - dist);
+              if (dist > this.minDistance) {
+                  this.chart.data.datasets[0].backgroundColor[0] = this.colorOk;
+              } else {
+                  this.chart.data.datasets[0].backgroundColor[0] = this.colorWarn;
+              }
+              this.chart.update();
+              this.distance = dist;
+          }
+      },
+      async mounted() {
+            this.distance = await this.getDistance();
             this.chart = new Chart(document.getElementById('dist-gauge'), {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [this.distance, this.max_distance - this.distance],
+                        data: [this.distance, this.maxDistance - this.distance],
                         backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(54, 162, 235)',
+                            this.colorOk,
+                            this.colorBg,
                         ],
                     }],
                 },
@@ -34,15 +59,12 @@ export default {
                 }
             });  // this.chart
 
+            this.chart.options.animation.duration = 0;
             setInterval(() => {
-                this.distance = 10 + Math.floor(Math.random() * 5)
-                this.chart.options.animation.duration = 0;
-                this.chart.data.datasets[0].data.pop();
-                this.chart.data.datasets[0].data.pop();
-                this.chart.data.datasets[0].data.push(this.distance);
-                this.chart.data.datasets[0].data.push(this.max_distance - this.distance);
-                this.chart.update()
-            }, this.refresh_interval)
+                    this.update();
+                },
+                this.refresh_interval
+            );
       } // mounted
 };
 

@@ -14,17 +14,18 @@ def main():
     start =now - timedelta(days=365)
     logger.info("Creating back-data...")
     timestamp = start + timedelta(minutes=dist_poll_int)
-    while timestamp  < now:
+    #while timestamp  < now:
+    #    distance = random.choice(range(20, 40))
+    #    storage.set_distance(distance, ts=timestamp)
+    #    timestamp = timestamp + timedelta(minutes=dist_poll_int)
+    #logger.info("Back-data created!")
+    while True:
         distance = random.choice(range(20, 40))
-        storage.set_distance(distance, ts=timestamp)
-        timestamp = timestamp + timedelta(minutes=dist_poll_int)
-    logger.info("Back-data created!")
-    while True:        
-        distance = random.choice(range(20, 40))        
         storage.set_distance(distance)
-        time.sleep(dist_poll_int * 60)
+        #time.sleep(dist_poll_int * 60)
+        time.sleep(5)
 
 
 
 if __name__ == "__main__":
-    main()        
+    main()
