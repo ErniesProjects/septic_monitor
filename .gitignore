@@ -1,4 +1,5 @@
 redis
+.vscode
 .htpasswd
 
 # Byte-compiled / optimized / DLL files

@@ -2,7 +2,8 @@ export default {
       name: 'DistGauge',
       template: `
         <div>
-            <div class="text-center">Dist: {{ distance }} cm</div>
+            <div class="text-center">Distance: {{ distance }} cm</div>
+            <div class="text-center" style="color:#999">(warn @ {{ minDistance }})</div>
             <canvas id="dist-gauge"></canvas>
         </div>
       `,
