@@ -1,9 +1,11 @@
 export default {
   name: 'AmpGauge',
   template: `
-    <div>
-        <canvas id="amp-gauge"></canvas>
-    </div>
+  <div>
+    <div class="text-center">Amperage: {{ distance }} cm</div>
+    <div class="text-center" style="color:#999">(warn @ {{ minDistance }})</div>
+    <canvas id="amp-gauge"></canvas>
+  </div>
   `,
   data: () => ({
         cpuloads: [],

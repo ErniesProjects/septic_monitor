@@ -106,7 +106,7 @@ def get_amperage():
     return get_distance()  # FIXME
 
 
-def get_last_update():
+def get_last_update():    
     return max(
         x.timestamp
         for x in (

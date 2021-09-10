@@ -1,5 +1,6 @@
 import DistGauge from './components/DistGauge.js';
 import AmpGauge from './components/AmpGauge.js';
+import LastUpdate from './components/LastUpdate.js';
 
 Vue.use(Vuetify);
 
@@ -10,10 +11,8 @@ new Vue({
         <v-app>
           <v-main>
             <v-container>
-                <div>
-                    {{ message }}
-                </div>
-                <v-row>
+                <v-row align="center" justify="center">
+                    <v-col><LastUpdate></LastUpdate></v-col>
                     <v-col><DistGauge></DistGauge></v-col>
                     <v-col><AmpGauge></AmpGauge></v-col>
                 </v-row>
@@ -24,6 +23,7 @@ new Vue({
     components: {
         AmpGauge,
         DistGauge,
+        LastUpdate,
     },
     data() {
         return {
