@@ -1,7 +1,7 @@
 import logging
 import time
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from attr import attrs, attrib
 from redis import Redis
@@ -91,12 +91,25 @@ def set_distance(distance, ts=None):
     logger.info("Set distance: %s cm", distance)
 
 
-def get_distance():
+def get_distance(duration=None):
     """
-    Gets the lastest distance from the db
+    Gets the latest distance, or a duration of distances (from now)
     """
-    ts, v = RTS.get(Keys.dist)
-    return Distance(datetime.fromtimestamp(ts), v)
+    if duration is None:
+        ts, v = RTS.get(Keys.dist)
+        return Distance(datetime.fromtimestamp(ts), v)
+    now = datetime.now()
+    if duration == "hour":
+        start = int((now - timedelta(hours=1)).timestamp())
+    elif duration == "day":
+        start = int((now - timedelta(days=1)).timestamp())
+    elif duration == "week":
+        start = int((now - timedelta(days=7)).timestamp())
+    end = int(now.timestamp())
+    return [
+        Distance(datetime.fromtimestamp(ts), v) for ts, v in RTS.range(Keys.dist, start, end)
+    ]
+    
 
 
 def get_amperage():
