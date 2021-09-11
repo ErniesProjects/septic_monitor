@@ -5,26 +5,20 @@ from RPLCD.i2c import CharLCD
 from septic_monitor import storage
 
 
-LCD = CharLCD(
-    i2c_expander="PCF8574",
-    address=0x27,  # i2cdetect -y 1
-    port=1,
-    charmap="A00",
-    cols=20,
-    rows=4
-)
+LCD = CharLCD(i2c_expander="PCF8574", address=0x27, port=1, charmap="A00", cols=20, rows=4)  # i2cdetect -y 1
 
 LCD.clear()
 
+
 class Cursor:
-    power = (0,0)
-    pump = (0,12)
-    level_msg = (1,0)
-    current = (1,12)
+    power = (0, 0)
+    pump = (0, 12)
+    level_msg = (1, 0)
+    current = (1, 12)
     time = (3, 0)
     date = (3, 10)
     level = (2, 0)
-    
+
 
 lcd.cursor_pos = Cursor.power
 lcd.write_string("POWER OK")
@@ -42,9 +36,8 @@ while True:
     lcd.cursor_pos = Cursor.date
     lcd.write_string(time.strftime("%Y-%m-%d"))
 
-    
     lcd.cursor_pos = Cursor.level
     level = storage.get_level()
     lcd.write_string(f"Level: {level:.1f} cm")
-    
+
     time.sleep(2)

@@ -25,7 +25,7 @@ class Keys:
     level_poll = "level:poll"
     level_max = "level:max"
     amp = "amp"
-    
+
 
 # wait for db
 while True:
@@ -55,10 +55,9 @@ def create_rts(key, retention):
         if "key already exists" not in str(e).casefold():
             raise
 
-for rts in (
-        (Keys.level, RETENTION_DAYS * MS_IN_DAY),        
-    ):
-        create_rts(rts[0], rts[1])
+
+for rts in ((Keys.level, RETENTION_DAYS * MS_IN_DAY),):
+    create_rts(rts[0], rts[1])
 
 
 @attrs
@@ -130,13 +129,14 @@ def get_level(duration=None):
         start = 0
     end = int(now.timestamp())
     return [
-        Level(datetime.fromtimestamp(ts), v) for ts, v in RTS.range(Keys.level, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
+        Level(datetime.fromtimestamp(ts), v)
+        for ts, v in RTS.range(Keys.level, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
     ]
 
 
 def get_lowest_level():
     return min(l.value for l in get_level(duration="all"))
-    
+
 
 def get_amperage():
     """
@@ -145,7 +145,7 @@ def get_amperage():
     return get_level()  # FIXME
 
 
-def get_last_update():    
+def get_last_update():
     return max(
         x.timestamp
         for x in (

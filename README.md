@@ -22,7 +22,7 @@ python -m pip install pip setuptools wheel --upgrade      # upgrade some essenti
 Cloning the repo and creating the venv only need to be done once.  Now, every time you want to work on the project, simply cd into the repository directory (with the README.md file) and activate the venv:
 
 ```
-cd septic_monitor			     # if you're not already in this directory
+cd septic_monitor                # if you're not already in this directory
 source venv/bin/activate
 ```
 
@@ -32,7 +32,7 @@ You can install dependencies (defined in the `setup.py` script) using pip.  Agai
 
 ```
 python3 -m pip install -e .
-```   
+```
 
 You can now run your `main.py` script as usual:
 
@@ -60,12 +60,21 @@ If you want to work on your project with Thonny, simply launch it from the menu 
 `Tools -> Options -> Interpreter Tab` then select `Alternative Python 3 interpreter or virtual environment` in the drop-down menu and press `Locate another python executable`.  Use the file browser to find the `venv/bin/python3` file from the root of your repository.  You'll only need to set this up once.
 
 
+### Docker
+
+```
+make docker
+# close and re-open the terminal, and re-activate the venv
+python3 -m pip install docker-compose
+```
+
+
 ### Replication
 
 Local:
 
 ```
-ssh -nNT -R 9999:172.18.0.1:6379 user@192.168.2.12
+ssh -nNT -R 9999:172.18.0.1:6379 user@192.168.2.12  # FIXME - systemd service
 ```
 
 Remote:
