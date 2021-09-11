@@ -24,8 +24,7 @@ export default {
 		},
 		async update() {
 			var dist = await this.getDistance();
-			this.chart.data.datasets[0].data.pop();
-			this.chart.data.datasets[0].data.pop();
+			this.chart.data.datasets[0].data = [];			
 			this.chart.data.datasets[0].data.push(dist);
 			this.chart.data.datasets[0].data.push(this.maxDistance - dist);
 			if (dist > this.minDistance) {

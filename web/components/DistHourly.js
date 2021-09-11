@@ -16,7 +16,10 @@ export default {
             return r.data;
         },
         async update() {
-            var dists = await this.getDistances(); // FIXME - update chart
+            var dists = await this.getDistances();
+            this.chart.data.datasets[0].data = dists;
+			this.chart.update();
+            this.distances = dists;
         }
     },
     async mounted() {
@@ -25,7 +28,10 @@ export default {
             type: 'line',
             data: {                
                 datasets: [{
+                    label: "Hourly Distance",
                     data: this.distances,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
                 }],
             },
             options: {
@@ -37,8 +43,8 @@ export default {
             }
         });  // this.chart
 
-        //this.chart.options.animation.duration = 0;
-        //setInterval(() => {this.update();},   this.refresh_interval);
+        this.chart.options.animation.duration = 0;
+        setInterval(() => {this.update();},   this.refresh_interval);
     } // mounted
 };
 

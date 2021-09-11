@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
 
 
-
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 logger.info(f"Redis host: {REDIS_HOST}")
 
@@ -25,6 +24,7 @@ class Keys:
     dist_poll_int = "dist_poll_int"
     min_dist = "min_dist"
     dist = "dist"
+    dist_hour = "dist:hour"
     amp = "amp"
     
 
@@ -42,20 +42,40 @@ while True:
 
 
 MS_IN_DAY = 86400000
-RETENTION_DAYS = int(REDIS.get(Keys.ret_days)) if REDIS.exists(Keys.ret_days) else 365
-DIST_POLL_INT = (
-    int(REDIS.get(Keys.dist_poll_int)) if REDIS.exists(Keys.dist_poll_int) else 10
-)
+MS_IN_HOUR = 3600000
+MS_IN_MINUTE = 60000
+RETENTION_DAYS = int(REDIS.get(Keys.ret_days)) if REDIS.exists(Keys.ret_days) else 30
+DIST_POLL_INT = int(REDIS.get(Keys.dist_poll_int)) if REDIS.exists(Keys.dist_poll_int) else 10
 MIN_DIST = int(REDIS.get(Keys.min_dist)) if REDIS.exists(Keys.min_dist) else None
 
 
-try:
-    RTS.create(
-        Keys.dist, retention_msecs=RETENTION_DAYS * MS_IN_DAY, duplicate_policy="last"
-    )
-except Exception as e:
-    if "key already exists" not in str(e).casefold():
-        raise
+def create_rts(key, retention):
+    try:
+        RTS.create(key, retention=retention, duplicate_policy="last")
+    except Exception as e:
+        if "key already exists" not in str(e).casefold():
+            raise
+
+def create_rts_rule(src, dst, agg, bucket):
+    try:
+        RTS.createrule(src, dst, agg, bucket)
+    except Exception as e:
+        if "key already has a rule" not in str(e).casefold():
+            raise            
+
+
+for rts in (
+        (Keys.dist, RETENTION_DAYS * MS_IN_DAY),
+        (Keys.dist_hour, 1 * MS_IN_HOUR),
+    ):
+        create_rts(rts[0], rts[1])
+
+
+for rts_rule in (
+        (Keys.dist, Keys.dist_hour, "min", 5 * MS_IN_MINUTE),
+    ):
+        create_rts_rule(rts_rule[0], rts_rule[1], rts_rule[2], rts_rule[3])
+
 
 
 @attrs
@@ -111,6 +131,7 @@ def get_distance(duration=None):
     now = datetime.now(pytz.UTC)
     if duration == "hour":
         start = int((now - timedelta(hours=1)).timestamp())
+        bucket_size = 100
     elif duration == "day":
         start = int((now - timedelta(days=1)).timestamp())
     elif duration == "week":
@@ -119,7 +140,7 @@ def get_distance(duration=None):
         start = int((now - timedelta(days=31)).timestamp())
     end = int(now.timestamp())
     return [
-        Distance(datetime.fromtimestamp(ts), v) for ts, v in RTS.range(Keys.dist, start, end)
+        Distance(datetime.fromtimestamp(ts), v) for ts, v in RTS.range(Keys.dist, start, "+", aggregation_type="min", bucket_size_msec=bucket_size)
     ]
 
 
@@ -131,8 +152,7 @@ def get_amperage():
     return get_distance()  # FIXME
 
 
-def get_last_update():
-    print(LOCAL_TIMEZONE)
+def get_last_update():    
     return max(
         x.timestamp
         for x in (
