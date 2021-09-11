@@ -56,26 +56,11 @@ def create_rts(key, retention):
         if "key already exists" not in str(e).casefold():
             raise
 
-def create_rts_rule(src, dst, agg, bucket):
-    try:
-        RTS.createrule(src, dst, agg, bucket)
-    except Exception as e:
-        if "key already has a rule" not in str(e).casefold():
-            raise            
-
-
 for rts in (
         (Keys.dist, RETENTION_DAYS * MS_IN_DAY),
         (Keys.dist_hour, 1 * MS_IN_HOUR),
     ):
         create_rts(rts[0], rts[1])
-
-
-for rts_rule in (
-        (Keys.dist, Keys.dist_hour, "min", 5 * MS_IN_MINUTE),
-    ):
-        create_rts_rule(rts_rule[0], rts_rule[1], rts_rule[2], rts_rule[3])
-
 
 
 @attrs
