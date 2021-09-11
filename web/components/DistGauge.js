@@ -1,9 +1,8 @@
-export default {
-	name: 'DistGauge',
+export default Vue.component('DistGauge', {
 	template: `
 	<div>
 		<div class="text-center">Distance: {{ distance }} cm</div>
-		<div class="text-center" style="color:#999">(warn @ {{ minDistance }})</div>
+		<div class="text-center" style="color:#999">(warn < {{ minDistance }})</div>
 		<canvas id="dist-gauge"></canvas>
 	</div>
 	`,
@@ -19,8 +18,8 @@ export default {
 	}),
 	methods: {
 		async getDistance() {
-			const r = await axios.get('/api/distance/');
-			return r.data.value;  // FIXME
+			var r = await axios.get('/api/distance/');
+			return r.data.value;  // wait to refresh gauge before set data attr
 		},
 		async update() {
 			var dist = await this.getDistance();
@@ -55,8 +54,6 @@ export default {
 		});  // this.chart
 
 		this.chart.options.animation.duration = 0;
-		setInterval(() => {this.update();},	this.refresh_interval);
+		setInterval(this.update, this.refresh_interval);
 	} // mounted
-};
-
-
+});

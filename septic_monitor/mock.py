@@ -24,7 +24,7 @@ def main():
         distance = random.choice(range(20, 40))
         storage.set_distance(distance)
         # time.sleep(dist_poll_int * 60)
-        time.sleep(60)
+        time.sleep(15)
 
 
 if __name__ == "__main__":

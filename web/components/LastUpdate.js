@@ -1,5 +1,4 @@
-export default {
-	name: 'LastUpdate',
+export default Vue.component('LastUpdate', {	
 	template: `
 	<div class="text-center">
 		<div class="font-weight-bold text-h4 text--secondary">Last Update</div>
@@ -31,4 +30,4 @@ export default {
 			this.refresh_interval
 		);
 	} // mounted
-};
+});
