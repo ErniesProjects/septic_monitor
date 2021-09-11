@@ -1,7 +1,9 @@
+import os
 import logging
+import pytz
 import time
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from attr import attrs, attrib
 from redis import Redis
@@ -10,6 +12,13 @@ from redistimeseries.client import Client
 
 logger = logging.getLogger(__name__)
 
+LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
+
+
+
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+logger.info(f"Redis host: {REDIS_HOST}")
+
 
 class Keys:
     ret_days = "ret_days"
@@ -17,14 +26,15 @@ class Keys:
     min_dist = "min_dist"
     dist = "dist"
     amp = "amp"
-
+    
 
 # wait for db
 while True:
     try:
-        REDIS = Redis()
+        REDIS = Redis(host=REDIS_HOST)
         REDIS.ping()
-        RTS = Client()
+        RTS = Client(host=REDIS_HOST)
+        logger.info("Connected to Redis!")
         break
     except Exception as e:
         logger.error(f"Unable to connect to Redis: {e}")
@@ -85,7 +95,7 @@ def set_distance(distance, ts=None):
     """
     RTS.add(
         Keys.dist,
-        int(ts.timestamp()) if ts else int(datetime.now().timestamp()),
+        int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
         float(distance),
     )
     logger.info("Set distance: %s cm", distance)
@@ -98,18 +108,20 @@ def get_distance(duration=None):
     if duration is None:
         ts, v = RTS.get(Keys.dist)
         return Distance(datetime.fromtimestamp(ts), v)
-    now = datetime.now()
+    now = datetime.now(pytz.UTC)
     if duration == "hour":
         start = int((now - timedelta(hours=1)).timestamp())
     elif duration == "day":
         start = int((now - timedelta(days=1)).timestamp())
     elif duration == "week":
         start = int((now - timedelta(days=7)).timestamp())
+    elif duration == "month":
+        start = int((now - timedelta(days=31)).timestamp())
     end = int(now.timestamp())
     return [
         Distance(datetime.fromtimestamp(ts), v) for ts, v in RTS.range(Keys.dist, start, end)
     ]
-    
+
 
 
 def get_amperage():
@@ -119,7 +131,8 @@ def get_amperage():
     return get_distance()  # FIXME
 
 
-def get_last_update():    
+def get_last_update():
+    print(LOCAL_TIMEZONE)
     return max(
         x.timestamp
         for x in (

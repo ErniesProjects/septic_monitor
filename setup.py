@@ -4,9 +4,12 @@ install_requires = [
     "attrs",
     "docker-compose",
     "fastapi",
+    "pytz",
     "redistimeseries",
     "RPi.GPIO",
     "RPLCD",
+    "smbus",
+    "uvicorn",
 ]
 
 setup(
