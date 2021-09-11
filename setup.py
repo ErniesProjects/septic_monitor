@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 
 install_requires = [
+    "adafruit-circuitpython-ads1x15",
     "attrs",
     "docker-compose",
     "fastapi",
