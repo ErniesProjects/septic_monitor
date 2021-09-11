@@ -130,12 +130,12 @@ def get_level(duration=None):
         start = 0
     end = int(now.timestamp())
     return [
-        Level(datetime.fromtimestamp(ts), v) for ts, v in RTS.range(Keys.level, start, "+", aggregation_type="min", bucket_size_msec=bucket_size)
+        Level(datetime.fromtimestamp(ts), v) for ts, v in RTS.range(Keys.level, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
     ]
 
 
 def get_lowest_level():
-    return min(l.value for l in get_level(duration="all")
+    return min(l.value for l in get_level(duration="all"))
     
 
 def get_amperage():

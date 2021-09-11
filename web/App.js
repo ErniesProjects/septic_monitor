@@ -1,6 +1,6 @@
-import DistGauge from './components/DistGauge.js';
+import LevelGauge from './components/LevelGauge.js';
 import LastUpdate from './components/LastUpdate.js';
-import DistHourly from './components/DistHourly.js';
+import LevelHour from './components/LevelHour.js';
 
 Vue.use(Vuetify);
 
@@ -13,10 +13,10 @@ new Vue({
             <v-container>
                 <v-row align="center" justify="center">
                     <v-col><LastUpdate></LastUpdate></v-col>
-                    <v-col><DistGauge></DistGauge></v-col>
+                    <v-col><LevelGauge></LevelGauge></v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="12"><DistHourly></DistHourly></v-col>
+                    <v-col cols="12"><LevelHour></LevelHour></v-col>
                 </v-row>
             </v-container>
           </v-main>
@@ -24,8 +24,8 @@ new Vue({
     `,
     components: {
         LastUpdate,
-        DistGauge,
-        DistHourly,
+        LevelGauge,
+        LevelHour,
     },
     data() {
         return {

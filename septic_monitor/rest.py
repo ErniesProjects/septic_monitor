@@ -16,7 +16,7 @@ async def get_level():
 @app.get("/api/level/{duration}/")
 async def get_level(duration):    
     return [        
-        {"x": l.timestamp, "y": l.value} for d in storage.get_level(duration=duration)
+        {"x": l.timestamp, "y": l.value} for l in storage.get_level(duration=duration)
     ]
 
 
