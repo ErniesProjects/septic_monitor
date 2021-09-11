@@ -21,10 +21,9 @@ logger.info(f"Redis host: {REDIS_HOST}")
 
 class Keys:
     ret_days = "ret_days"
-    dist_poll_int = "dist_poll_int"
-    min_dist = "min_dist"
-    dist = "dist"
-    dist_hour = "dist:hour"
+    level = "level"
+    level_poll = "level:poll"
+    level_max = "level:max"
     amp = "amp"
     
 
@@ -45,8 +44,8 @@ MS_IN_DAY = 86400000
 MS_IN_HOUR = 3600000
 MS_IN_MINUTE = 60000
 RETENTION_DAYS = int(REDIS.get(Keys.ret_days)) if REDIS.exists(Keys.ret_days) else 30
-DIST_POLL_INT = int(REDIS.get(Keys.dist_poll_int)) if REDIS.exists(Keys.dist_poll_int) else 10
-MIN_DIST = int(REDIS.get(Keys.min_dist)) if REDIS.exists(Keys.min_dist) else None
+LEVEL_POLL_INT = int(REDIS.get(Keys.level_poll)) if REDIS.exists(Keys.level_poll) else 10
+LEVEL_MAX = int(REDIS.get(Keys.level_max)) if REDIS.exists(Keys.level_max) else None
 
 
 def create_rts(key, retention):
@@ -57,14 +56,13 @@ def create_rts(key, retention):
             raise
 
 for rts in (
-        (Keys.dist, RETENTION_DAYS * MS_IN_DAY),
-        (Keys.dist_hour, 1 * MS_IN_HOUR),
+        (Keys.level, RETENTION_DAYS * MS_IN_DAY),        
     ):
         create_rts(rts[0], rts[1])
 
 
 @attrs
-class Distance:
+class Level:
     timestamp = attrib()
     value = attrib()
 
@@ -86,33 +84,38 @@ def set_retention(days):
     REDIS.set(Keys.ret_days, days)
 
 
-def get_dist_poll_int():
-    return DIST_POLL_INT
+def get_level_poll_int():
+    return LEVEL_POLL_INT
 
 
-def set_dist_poll_int(minutes):
-    REDIS.set(Keys.dist_poll_int, minutes)
+def set_level_poll_int(minutes):
+    REDIS.set(Keys.level_poll, minutes)
 
 
-def set_distance(distance, ts=None):
+def get_max_level():
+    return -5  # FIXME
+
+
+def set_level(level, ts=None):
     """
-    Sets the distance in the db at the current time
+    Sets the water level in the db (sensor is zero)
     """
+    level = float(0 - abs(level))
     RTS.add(
-        Keys.dist,
+        Keys.level,
         int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
-        float(distance),
+        level,
     )
-    logger.info("Set distance: %s cm", distance)
+    logger.info("Set level: %s cm", level)
 
 
-def get_distance(duration=None):
+def get_level(duration=None):
     """
-    Gets the latest distance, or a duration of distances (from now)
+    Gets the latest level, or a duration of levels (from now)
     """
     if duration is None:
-        ts, v = RTS.get(Keys.dist)
-        return Distance(datetime.fromtimestamp(ts), v)
+        ts, v = RTS.get(Keys.level)
+        return Level(datetime.fromtimestamp(ts), v)
     now = datetime.now(pytz.UTC)
     if duration == "hour":
         start = int((now - timedelta(hours=1)).timestamp())
@@ -123,25 +126,30 @@ def get_distance(duration=None):
         start = int((now - timedelta(days=7)).timestamp())
     elif duration == "month":
         start = int((now - timedelta(days=31)).timestamp())
+    elif duration == "all":
+        start = 0
     end = int(now.timestamp())
     return [
-        Distance(datetime.fromtimestamp(ts), v) for ts, v in RTS.range(Keys.dist, start, "+", aggregation_type="min", bucket_size_msec=bucket_size)
+        Level(datetime.fromtimestamp(ts), v) for ts, v in RTS.range(Keys.level, start, "+", aggregation_type="min", bucket_size_msec=bucket_size)
     ]
 
 
+def get_lowest_level():
+    return min(l.value for l in get_level(duration="all")
+    
 
 def get_amperage():
     """
     Gets the latest amperage fromt he db
     """
-    return get_distance()  # FIXME
+    return get_level()  # FIXME
 
 
 def get_last_update():    
     return max(
         x.timestamp
         for x in (
-            get_distance(),
+            get_level(),
             get_amperage(),
         )
     )

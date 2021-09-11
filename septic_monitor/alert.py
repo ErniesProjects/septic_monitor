@@ -1,1 +1,1 @@
-MIN_DISTANCE = os.getenv("MIN_DISTANCE")
+

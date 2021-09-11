@@ -8,7 +8,7 @@ export default Vue.component('DistHourly', {
         distances: [],
         chart: null,
         refresh_interval: 2000,
-        minDistance: 25,  // FIXME
+        minDistance: -5,  // FIXME
         colorLine: "rgb(54, 162, 235)",
 		colorWarn: "rgb(220, 53, 69)",
     }),
@@ -20,6 +20,7 @@ export default Vue.component('DistHourly', {
         async update() {
             var dists = await this.getDistances();
             this.chart.data.datasets[0].data = dists;
+            this.chart.data.datasets[1].data = [{x: this.distances[0].x, y: this.minDistance}, {x: this.distances.at(-1).x, y: this.minDistance}],
 			this.chart.update();
             this.distances = dists;
         }
@@ -31,14 +32,14 @@ export default Vue.component('DistHourly', {
             data: {
                 datasets: [
                     {
-                        label: "Hourly Distance",
+                        label: "Hourly Level",
                         data: this.distances,
                         borderColor: this.colorLine,
                         tension: 0.1
                     },
                     {
-                        label: "Min Safe",
-                        fill: true,
+                        label: "Max Safe",
+                        fill: "start",                        
                         data: [{x: this.distances[0].x, y: this.minDistance}, {x: this.distances.at(-1).x, y: this.minDistance}],
                         borderColor: this.colorWarn,                        
                     }
@@ -50,13 +51,6 @@ export default Vue.component('DistHourly', {
                         type: 'time',
                     }
                 },
-                //plugins: {
-                //    annotation: {
-                //        annotations: {
-                //              warnAnnotation,
-                //        }
-                //    }
-                //},
             }
         });  // this.chart
 

@@ -1,6 +1,8 @@
-redis
+appendonly.aof
+dump.rdb
 .vscode
 .htpasswd
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

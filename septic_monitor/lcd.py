@@ -2,8 +2,8 @@ import time
 
 from RPLCD.i2c import CharLCD
 
+from septic_monitor import storage
 
-from time import sleep
 
 LCD = CharLCD(
     i2c_expander="PCF8574",
@@ -14,48 +14,37 @@ LCD = CharLCD(
     rows=4
 )
 
-
 LCD.clear()
 
 class Cursor:
+    power = (0,0)
+    pump = (0,12)
+    level_msg = (1,0)
+    current = (1,12)
     time = (3, 0)
     date = (3, 10)
-    distance = (2, 0)
+    level = (2, 0)
     
-# Write a string on first line and move to next line
-lcd.cursor_pos = (0, 0)
+
+lcd.cursor_pos = Cursor.power
 lcd.write_string("POWER OK")
-lcd.cursor_pos = (0, 12)
+lcd.cursor_pos = Cursor.pump
 lcd.write_string("PUMP OFF")
-lcd.cursor_pos = (1, 0)
+lcd.cursor_pos = Cursor.level_msg
 lcd.write_string("LEVEL OK")
-lcd.cursor_pos = (1, 12)
+lcd.cursor_pos = Cursor.current
 lcd.write_string("Ip= 0.0A")
-sleep(5)
+
 while True:
     lcd.cursor_pos = Cursor.time
     lcd.write_string(time.strftime("%H:%M:%S"))
 
-    lcd.cursor_pos = (3, 10)
-    lcd.write_string(time.strftime("%m/%d/%Y"))
+    lcd.cursor_pos = Cursor.date
+    lcd.write_string(time.strftime("%Y-%m-%d"))
 
-    print("Waiting for sensor to settle")
-    sleep(0.2)
-    print("Calculating distance")
-    GPIO.output(PIN_TRIGGER, GPIO.HIGH)
-    sleep(0.00002)
-    GPIO.output(PIN_TRIGGER, GPIO.LOW)
-    while GPIO.input(PIN_ECHO) == 0:
-        pulse_start_time = time.time()
-    while GPIO.input(PIN_ECHO) == 1:
-        pulse_end_time = time.time()
-    pulse_duration = pulse_end_time - pulse_start_time
-    distance = round(pulse_duration * 17150, 1)
-    print(("Distance:"), distance, ("cm"))
-
-    Udist = str(distance)
-
-    lcd.cursor_pos = 
-    lcd.write_string("Distance: ")
-    lcd.write_string(Udist)
-    lcd.write_string(" cm ")
+    
+    lcd.cursor_pos = Cursor.level
+    level = storage.get_level()
+    lcd.write_string(f"Level: {level:.1f} cm")
+    
+    time.sleep(2)

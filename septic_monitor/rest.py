@@ -8,18 +8,18 @@ app = FastAPI()
 
 logging.basicConfig(level=logging.INFO)
 
-@app.get("/api/distance/")
-async def distance():
-    return storage.get_distance()
+@app.get("/api/level/")
+async def get_level():
+    return storage.get_level()
 
 
-@app.get("/api/distance/{duration}/")
-async def distance(duration):
+@app.get("/api/level/{duration}/")
+async def get_level(duration):    
     return [        
-        {"x": d.timestamp, "y": d.value} for d in storage.get_distance(duration=duration)
+        {"x": l.timestamp, "y": l.value} for d in storage.get_level(duration=duration)
     ]
 
 
 @app.get("/api/lastupdate/")
-async def distance():    
+async def lastupdate():    
     return storage.get_last_update()

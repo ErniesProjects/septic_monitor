@@ -28,7 +28,7 @@ def main():
             pulse_end_time = time.time()
         pulse_duration = pulse_end_time - pulse_start_time
         distance = pulse_duration * 17150
-        storage.set_distance(distance)
+        storage.set_level(distance)  # storage will ensure this is a correct level
         logger.info("Distance: %d cm", distance)
 
 

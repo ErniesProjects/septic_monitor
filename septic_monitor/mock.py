@@ -10,11 +10,11 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    now = datetime.now()
-    dist_poll_int = storage.get_dist_poll_int()
-    start = now - timedelta(days=365)
-    logger.info("Creating back-data...")
-    timestamp = start + timedelta(minutes=dist_poll_int)
+    #now = datetime.now()
+    #dist_poll_int = storage.get_dist_poll_int()
+    #start = now - timedelta(days=365)
+    #logger.info("Creating back-data...")
+    #timestamp = start + timedelta(minutes=dist_poll_int)
     # while timestamp  < now:
     #    distance = random.choice(range(20, 40))
     #    storage.set_distance(distance, ts=timestamp)
@@ -22,7 +22,7 @@ def main():
     # logger.info("Back-data created!")
     while True:
         distance = random.choice(range(20, 40))
-        storage.set_distance(distance)
+        storage.set_level(distance)
         # time.sleep(dist_poll_int * 60)
         time.sleep(15)
 
