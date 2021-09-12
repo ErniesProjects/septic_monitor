@@ -6,7 +6,7 @@ from septic_monitor import storage
 
 app = FastAPI()
 
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 
 
 @app.get("/api/level/")

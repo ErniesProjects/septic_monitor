@@ -1,10 +1,11 @@
-export default Vue.component('LevelHour', {
+export default Vue.component('LevelChart', {
     template: `
     <div>
-        <canvas id="level-hour"></canvas>
+        <canvas :id="chartId"></canvas>
     </div>
     `,
-    data: () => ({
+    props: ["duration"],
+    data: () => ({        
         levels: [],
         chart: null,
         refresh_interval: 2000,
@@ -12,9 +13,14 @@ export default Vue.component('LevelHour', {
         colorLine: "rgb(54, 162, 235)",
 		colorWarn: "rgb(220, 53, 69)",
     }),
+    computed: {
+        chartId: function() {
+            return `level-${this.duration}-chart`;
+        }
+    },
     methods: {
         async getLevels() {
-            const r = await axios.get('/api/level/hour/');
+            const r = await axios.get(`/api/level/${this.duration}/`);
             return r.data;
         },
         async update() {
@@ -28,12 +34,13 @@ export default Vue.component('LevelHour', {
     },
     async mounted() {
         this.levels = await this.getLevels();
-        this.chart = new Chart(document.getElementById('level-hour'), {
+        console.log(this.levels);
+        this.chart = new Chart(document.getElementById(this.chartId), {
             type: 'line',
             data: {
                 datasets: [
                     {
-                        label: "Last Hour Levels",
+                        label: "Water Level",
                         data: this.levels,
                         borderColor: this.colorLine,
                         tension: 0.1,

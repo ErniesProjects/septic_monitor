@@ -121,12 +121,16 @@ def get_level(duration=None):
         bucket_size = 100
     elif duration == "day":
         start = int((now - timedelta(days=1)).timestamp())
+        bucket_size = 1000
     elif duration == "week":
         start = int((now - timedelta(days=7)).timestamp())
+        bucket_size = 10000
     elif duration == "month":
+        bucket_size = 100000
         start = int((now - timedelta(days=31)).timestamp())
     elif duration == "all":
         start = 0
+        bucket_size = 100000
     end = int(now.timestamp())
     return [
         Level(datetime.fromtimestamp(ts), v)
