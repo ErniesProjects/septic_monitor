@@ -8,4 +8,6 @@ WORKDIR /usr/share
 RUN git clone --recursive https://github.com/RedisTimeSeries/RedisTimeSeries.git && \
     cd RedisTimeSeries && make setup && make build
 
+WORKDIR /data
+
 CMD ["redis-server", "/etc/redis.conf"]
