@@ -11,7 +11,16 @@ new Vue({
         <v-app>
           <v-main>
             <v-container>
-                <v-row align="center" justify="center">
+
+               <v-toolbar color="blue">
+                  <v-toolbar-title class="ml-8">Septic Monitor</v-toolbar-title>
+                  <v-spacer></v-spacer>
+                  <v-btn icon>
+                      <v-icon>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </v-toolbar>
+
+                <v-row align="center" justify="center" class="mt-8">
                     <v-col><LastUpdate></LastUpdate></v-col>
                     <v-col><LevelGauge></LevelGauge></v-col>
                 </v-row>
