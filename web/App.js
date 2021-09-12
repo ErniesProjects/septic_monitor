@@ -13,7 +13,7 @@ new Vue({
             <v-container>
 
                <v-toolbar color="blue">
-                  <v-toolbar-title class="ml-8">Septic Monitor</v-toolbar-title>
+                  <v-toolbar-title class="ml-4">Septic Monitor</v-toolbar-title>
                   <v-spacer></v-spacer>
                   <v-btn icon>
                       <v-icon>mdi-dots-vertical</v-icon>
