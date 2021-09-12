@@ -1,7 +1,7 @@
 export default Vue.component('LevelGauge', {
 	template: `
 	<div>
-		<div class="text-center text--secondary"><h3>Water Level</h3></div>
+		<div class="text-center text--secondary"><h2>Water Level</h2></div>
         <div class="text-center text--secondary">{{ absLevel }} cm from sensor</div>
         <div class="text-center" style="color:#999">{{ lastUpdate }}</div>
 		<div class="text-center" style="color:#999">(warn > {{ maxLevel }})</div>

@@ -114,7 +114,7 @@ def get_level(duration=None):
     """
     if duration is None:
         ts, v = RTS.get(Keys.level)
-        return Level(datetime.fromtimestamp(ts), v)
+        return Level(datetime.fromtimestamp(ts), round(v, 2))
     now = datetime.now(pytz.UTC)
     if duration == "hour":
         start = int((now - timedelta(hours=1)).timestamp())

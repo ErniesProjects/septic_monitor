@@ -25,7 +25,7 @@ new Vue({
 
                 <v-row align="center" justify="center" class="mt-8">
                     <v-col>
-                        <v-card elevation="2" shaped class="py-16">
+                        <v-card elevation="2" shaped class="py-8">
                             <LastUpdate></LastUpdate>
                         </v-card>        
                     </v-col>
