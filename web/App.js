@@ -12,7 +12,10 @@ new Vue({
           <v-main>
             <v-container>
 
-               <v-toolbar color="blue">
+               <v-toolbar
+                  dark
+                  src="https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg"
+               >
                   <v-toolbar-title class="ml-4">Septic Monitor</v-toolbar-title>
                   <v-spacer></v-spacer>
                   <v-btn icon>
@@ -21,11 +24,15 @@ new Vue({
                 </v-toolbar>
 
                 <v-row align="center" justify="center" class="mt-8">
-                    <v-col><LastUpdate></LastUpdate></v-col>
+                    <v-col>
+                        <v-card elevation="2" shaped class="py-16">
+                            <LastUpdate></LastUpdate>
+                        </v-card>        
+                    </v-col>
                     <v-col><LevelGauge></LevelGauge></v-col>
                 </v-row>
 
-                <div class="mt-12 mb-6 text-center text--secondary"><h2>Water Level Charts</h2></div>
+                <div class="mt-12 mb-6 text-center text--secondary"><h2>Water Levels</h2></div>
                 
                 <div>
                     <v-tabs v-model="tab">
