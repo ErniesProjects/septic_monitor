@@ -1,16 +1,33 @@
 import LevelGauge from './components/LevelGauge.js';
 import LastUpdate from './components/LastUpdate.js';
 import LevelChart from './components/LevelChart.js';
+import SettingsDialog from './components/SettingsDialog.js';
 
+
+Vue.use(Vuex);
 Vue.use(Vuetify);
+
+
+const store = new Vuex.Store({
+    state: {
+        maxLevel: null,            
+    },
+    mutations: {
+        setMaxLevel(state, level) {
+            state.maxLevel = level;        
+        }    
+    }
+})
+
 
 new Vue({
     el: "#app",
+    store: store,
     vuetify: new Vuetify(),
     template: `
         <v-app>
           <v-main>
-            <v-container>
+            <v-container fluid>
 
                <v-toolbar
                   dark
@@ -18,9 +35,14 @@ new Vue({
                >
                   <v-toolbar-title class="ml-4">Septic Monitor</v-toolbar-title>
                   <v-spacer></v-spacer>
-                  <v-btn icon>
-                      <v-icon>mdi-dots-vertical</v-icon>
-                  </v-btn>
+                  <v-dialog v-model="settingsOpen" fullscreen hide-overlay>
+                    <template v-slot:activator="{on, attrs}">
+                      <v-btn icon v-bind="attrs" v-on="on">
+                          <v-icon>mdi-dots-vertical</v-icon>
+                      </v-btn>                      
+                    </template>
+                    <SettingsDialog :settings-open.sync="settingsOpen"></SettingsDialog>
+                  </v-dialog>
                 </v-toolbar>
 
                 <v-row align="center" justify="center" class="mt-8">
@@ -56,12 +78,14 @@ new Vue({
         </v-app>
     `,
     components: {
+        SettingsDialog,
         LastUpdate,
         LevelGauge,
         LevelChart,
     },
     data() {
         return {
+            settingsOpen: false,
             tab: null,
         };
     },

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def check_level():
-    t = np.linspace(0, 1, 500)
+    t = np.linspace(0, 1, 5000)
     w = signal.sawtooth(2 * np.pi * 5 * t)
     for v in w.tolist():
         dither = random.randrange(-100, 100) / 100.0
@@ -34,7 +34,7 @@ def back_data():
             timestamp = timestamp + timedelta(minutes=5)
         else:
             timestamp = datetime.now()
-            time.sleep(15)
+            time.sleep(level_poll_int * 60)
 
 
 def main():
