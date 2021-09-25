@@ -3,7 +3,7 @@
 .PHONY: docker
 docker:
 	sudo apt update
-	sudo apt-get -y install apt-transport-https ca-certificates curl gnupg lsb-release
+	sudo apt-get -y install apt-transport-https ca-certificates curl gnupg lsb-release apache2-utils
 	curl -sSL https://get.docker.com | sh
 	sudo usermod -aG docker ${USER}
 	sudo systemctl enable docker

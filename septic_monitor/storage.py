@@ -114,23 +114,23 @@ def get_level(duration=None):
     """
     if duration is None:
         ts, v = RTS.get(Keys.level)
-        return Level(datetime.fromtimestamp(ts), v)
+        return Level(datetime.fromtimestamp(ts), round(v, 2))
     now = datetime.now(pytz.UTC)
     if duration == "hour":
         start = int((now - timedelta(hours=1)).timestamp())
-        bucket_size = 100
+        bucket_size = 50
     elif duration == "day":
         start = int((now - timedelta(days=1)).timestamp())
         bucket_size = 1000
     elif duration == "week":
         start = int((now - timedelta(days=7)).timestamp())
-        bucket_size = 10000
+        bucket_size = 5000
     elif duration == "month":
-        bucket_size = 100000
+        bucket_size = 15000
         start = int((now - timedelta(days=31)).timestamp())
     elif duration == "all":
         start = 0
-        bucket_size = 100000
+        bucket_size = 15000
     end = int(now.timestamp())
     return [
         Level(datetime.fromtimestamp(ts), v)

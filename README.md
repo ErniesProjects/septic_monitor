@@ -64,6 +64,7 @@ If you want to work on your project with Thonny, simply launch it from the menu 
 
 ```
 make docker
+htpasswd -c web/.htpasswd ernie
 ```
 
 

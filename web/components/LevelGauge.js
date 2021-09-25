@@ -1,8 +1,8 @@
 export default Vue.component('LevelGauge', {
 	template: `
 	<div>
-		<div class="text-center text--secondary"><h3>Water Level</h3></div>
-        <div class="text-center text--secondary">{{ absLevel }} cm from sensor</div>
+		<div class="text-center text--secondary"><h2>Water Level</h2></div>
+        <div class="text-center text--secondary"><h3>{{ absLevel }} cm from sensor</h3></div>
         <div class="text-center" style="color:#999">{{ lastUpdate }}</div>
 		<div class="text-center" style="color:#999">(warn > {{ maxLevel }})</div>
 		<canvas id="level-gauge"></canvas>
@@ -29,11 +29,11 @@ export default Vue.component('LevelGauge', {
 			var r = await axios.get('/api/level/');
 			return r.data;  // wait to refresh gauge before set data attr
 		},
-		async update() {            
+		async update() {
 			var l = await this.getLevel();
             var level = l.value;
-			this.chart.data.datasets[0].data = [];			
-			this.chart.data.datasets[0].data.push([this.lowestLevel, level]);			
+			this.chart.data.datasets[0].data = [];
+			this.chart.data.datasets[0].data.push([this.lowestLevel, level]);
 			if (level > this.maxLevel) {
 			  this.chart.data.datasets[0].backgroundColor = this.colorWarn;
 			} else {
@@ -49,10 +49,10 @@ export default Vue.component('LevelGauge', {
         this.level = l.value;
         this.lastUpdate = l.timestamp;
 		this.chart = new Chart(document.getElementById('level-gauge'), {
-			type: 'bar',   
+			type: 'bar',
 			data: {
                 labels: ["Level"],
-				datasets: [{                    
+				datasets: [{
 					data: [[this.lowestLevel, this.level]],
 					backgroundColor: this.colorOk,
 				}],
@@ -61,7 +61,7 @@ export default Vue.component('LevelGauge', {
                 plugins: {
                     legend: {
                         display: false,
-                    }                    
+                    }
                 },
                 scales: {
                     yAxes: [{
