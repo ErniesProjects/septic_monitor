@@ -54,15 +54,10 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
 
 # Do something!
+# New comment
 
-<<<<<<< HEAD
     while True:
         GPIO.output(LED_GPIO, GPIO.HIGH)
         time.sleep(0.5)
         GPIO.output(LED_GPIO, GPIO.LOW)
         time.sleep(0.5)
-=======
-while True:
-    print("{:>5}\t{:>5.3f}".format(chan.value, chan.voltage))
-    time.sleep(0.5)
->>>>>>> 25cf0810de7516d23d2847153b6c196d7a0cec6b
