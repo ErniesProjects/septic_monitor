@@ -5,7 +5,7 @@ export default Vue.component('LevelChart', {
     </div>
     `,
     props: ["duration"],
-    data: () => ({        
+    data: () => ({
         levels: [],
         chart: null,
         refresh_interval: 2000,
@@ -27,14 +27,13 @@ export default Vue.component('LevelChart', {
             var levels = await this.getLevels();
             this.chart.data.datasets[0].data = levels;
             this.chart.data.datasets[1].data = [{x: this.levels[0].x, y: this.maxLevel}, {x: this.levels.at(-1).x, y: this.maxLevel}],
-            this.chart.data.datasets[2].data = [{x: this.levels[0].x, y: 0}, {x: this.levels.at(-1).x, y: 0}],			
+            this.chart.data.datasets[2].data = [{x: this.levels[0].x, y: 0}, {x: this.levels.at(-1).x, y: 0}],
             this.chart.update();
             this.levels = levels;
         }
     },
     async mounted() {
         this.levels = await this.getLevels();
-        console.log(this.levels);
         this.chart = new Chart(document.getElementById(this.chartId), {
             type: 'line',
             data: {
@@ -48,14 +47,14 @@ export default Vue.component('LevelChart', {
                     },
                     {
                         label: "Max Safe",
-                        fill: "start",                        
+                        fill: "start",
                         data: [{x: this.levels[0].x, y: this.maxLevel}, {x: this.levels.at(-1).x, y: this.maxLevel}],
-                        borderColor: this.colorWarn,                        
+                        borderColor: this.colorWarn,
                     },
                     {
-                        label: "Sensor",                        
+                        label: "Sensor",
                         data: [{x: this.levels[0].x, y: 0}, {x: this.levels.at(-1).x, y: 0}],
-                        borderColor: "dimgray",                        
+                        borderColor: "dimgray",
                     }
 
                 ],

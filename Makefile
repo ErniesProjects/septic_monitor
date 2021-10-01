@@ -1,6 +1,5 @@
+SHELL:=/bin/bash
 
-
-.PHONY: docker
 docker:
 	sudo apt update
 	sudo apt-get -y install apt-transport-https ca-certificates curl gnupg lsb-release apache2-utils
@@ -12,3 +11,12 @@ docker:
 	@echo Re-launch your terminal, or run: newgrp docker
 	@echo Ensure you re-activate your venv if necessary
 	@echo ==============================================
+
+
+clean:
+	@echo WARNING - this will delete the Redis database
+	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
+	rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
+
+
+.PHONY: clean docker

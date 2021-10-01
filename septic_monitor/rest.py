@@ -15,8 +15,18 @@ async def get_level():
 
 
 @app.get("/api/level/{duration}/")
-async def get_level(duration):
+async def get_level_duration(duration):
     return [{"x": l.timestamp, "y": l.value} for l in storage.get_level(duration=duration)]
+
+
+@app.get("/api/amperage/")
+async def get_amperage():
+    return storage.get_amperage()
+
+
+@app.get("/api/amperage/{duration}/")
+async def get_amperage_duration(duration):
+    return [{"x": l.timestamp, "y": l.value} for l in storage.get_amperage(duration=duration)]
 
 
 @app.get("/api/lastupdate/")

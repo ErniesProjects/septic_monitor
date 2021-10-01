@@ -24,7 +24,7 @@ class Keys:
     level = "level"
     level_poll = "level:poll"
     level_max = "level:max"
-    amp = "amp"
+    amperage = "amperage"
 
 
 # wait for db
@@ -56,7 +56,10 @@ def create_rts(key, retention):
             raise
 
 
-for rts in ((Keys.level, RETENTION_DAYS * MS_IN_DAY),):
+for rts in (
+    (Keys.level, RETENTION_DAYS * MS_IN_DAY),
+    (Keys.amperage, RETENTION_DAYS * MS_IN_DAY),
+):
     create_rts(rts[0], rts[1])
 
 
@@ -70,9 +73,6 @@ class Level:
 class Amperage:
     timestamp = attrib()
     value = attrib()
-
-
-# FIXME - need to handle lost connection
 
 
 def get_retention():
@@ -105,7 +105,7 @@ def set_level(level, ts=None):
         int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
         level,
     )
-    logger.info("Set level: %s cm", level)
+    logger.info("%s Set level: %s cm", datetime.now(), level)
 
 
 def get_level(duration=None):
@@ -142,11 +142,49 @@ def get_lowest_level():
     return min(l.value for l in get_level(duration="all"))
 
 
-def get_amperage():
+def set_amperage(amperage, ts=None):
     """
-    Gets the latest amperage fromt he db
+    Sets the pump amperage in the db
     """
-    return get_level()  # FIXME
+    amperage = float(amperage)
+    RTS.add(
+        Keys.amperage,
+        int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
+        amperage,
+    )
+    logger.info("%s Set amperage: %s", datetime.now(), amperage)
+
+
+def get_amperage(duration=None):
+    """
+    Gets the latest pump amperage, or a duration of amperages (from now)
+    """
+    if duration is None:
+        ts, v = RTS.get(Keys.amperage)
+        return Amperage(datetime.fromtimestamp(ts), round(v, 2))
+    now = datetime.now(pytz.UTC)
+    if duration == "10min":
+        start = int((now - timedelta(minutes=10)).timestamp())
+        bucket_size = 1
+    elif duration == "hour":
+        start = int((now - timedelta(hours=1)).timestamp())
+        bucket_size = 50
+    elif duration == "day":
+        start = int((now - timedelta(days=1)).timestamp())
+        bucket_size = 1000
+    elif duration == "week":
+        start = int((now - timedelta(days=7)).timestamp())
+        bucket_size = 5000
+    elif duration == "month":
+        bucket_size = 15000
+        start = int((now - timedelta(days=31)).timestamp())
+    elif duration == "all":
+        start = 0
+        bucket_size = 15000    
+    return [
+        Amperage(datetime.fromtimestamp(ts), v)
+        for ts, v in RTS.range(Keys.amperage, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
+    ]
 
 
 def get_last_update():

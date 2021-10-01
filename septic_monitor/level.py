@@ -15,6 +15,7 @@ PIN_TRIGGER = 14
 PIN_ECHO = 15
 GPIO.setup(PIN_TRIGGER, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(PIN_ECHO, GPIO.IN)
+TIME_DIST_FACTOR = 17150
 
 
 def main():
@@ -27,10 +28,10 @@ def main():
         while GPIO.input(PIN_ECHO) == 1:
             pulse_end_time = time.time()
         pulse_duration = pulse_end_time - pulse_start_time
-        distance = pulse_duration * 17150
+        distance = pulse_duration * TIME_DIST_FACTOR
         storage.set_level(distance)  # storage will ensure this is a correct level
         logger.info("Distance: %d cm", distance)
-
+        time.sleep(storage.get_level_poll_int())
 
 if __name__ == "__main__":
     main()

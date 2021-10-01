@@ -42,8 +42,8 @@ def main():
         back_data()
 
     while True:
-        level = random.choice(range(20, 40))
-        storage.set_level(level)
+        storage.set_level(random.choice(range(20, 40)))
+        storage.set_amperage(random.choice(range(1, 14)))
         time.sleep(15)
 
 

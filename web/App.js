@@ -1,6 +1,7 @@
 import LevelGauge from './components/LevelGauge.js';
 import LastUpdate from './components/LastUpdate.js';
 import LevelChart from './components/LevelChart.js';
+import AmpGauge from './components/AmpGauge.js';
 import SettingsDialog from './components/SettingsDialog.js';
 
 
@@ -42,16 +43,17 @@ new Vue({
                   </v-dialog>
                 </v-toolbar>
 
-                <v-row align="center" justify="center" class="mt-8">
+                <v-row align="top" justify="center" class="mt-8">
                     <v-col>
                         <v-card elevation="2" shaped class="py-8">
                             <LastUpdate></LastUpdate>
                         </v-card>
                     </v-col>
                     <v-col><LevelGauge></LevelGauge></v-col>
+                    <v-col><AmpGauge></AmpGauge></v-col>
                 </v-row>
 
-                <div class="mt-12 mb-6 text-center text--secondary"><h2>Water Levels</h2></div>
+                <div class="mt-12 mb-6 text-center text--secondary"><h2>Tank Levels</h2></div>
 
                 <div>
                     <v-tabs v-model="tab">
@@ -79,6 +81,7 @@ new Vue({
         LastUpdate,
         LevelGauge,
         LevelChart,
+        AmpGauge,
     },
     data() {
         return {
