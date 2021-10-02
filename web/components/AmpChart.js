@@ -54,6 +54,7 @@ export default Vue.component('AmpChart', {
                 ],
             },
             options: {
+                scaleBeginAtZero: true,
                 scales: {
                     xAxis: {
                         type: 'time',

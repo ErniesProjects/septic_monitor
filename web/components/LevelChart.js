@@ -26,8 +26,8 @@ export default Vue.component('LevelChart', {
         async update() {
             var levels = await this.getLevels();
             this.chart.data.datasets[0].data = levels;
-            this.chart.data.datasets[1].data = [{x: this.levels[0].x, y: this.maxLevel}, {x: this.levels.at(-1).x, y: this.maxLevel}],
-            this.chart.data.datasets[2].data = [{x: this.levels[0].x, y: 0}, {x: this.levels.at(-1).x, y: 0}],
+            this.chart.data.datasets[1].data = [{x: levels[0].x, y: this.maxLevel}, {x: levels.at(-1).x, y: this.maxLevel}],
+            this.chart.data.datasets[2].data = [{x: levels[0].x, y: 0}, {x: levels.at(-1).x, y: 0}],
             this.chart.update();
             this.levels = levels;
         }
