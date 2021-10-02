@@ -1,16 +1,17 @@
 #Read pump AC current while pump is running
 #Monitors 120VAC powering pump
 
-import RPi.GPIO as GPIO
-
-import signal  
+import signal
 import sys
 import time
 
+import adafruit_ads1x15.ads1015 as ADS
 import board
 import busio
-import adafruit_ads1x15.ads1015 as ADS
+import RPi.GPIO as GPIO
 from adafruit_ads1x15.analog_in import AnalogIn
+
+from septic_monitor import storage
 
 PUMP_RUNNING_GPIO = 16
 PUMP_AC_POWER_GPIO = 12
@@ -26,6 +27,7 @@ def signal_handler(sig, frame):
 
 def pump_AC_callback(channel):
     print("Pump AC Fail")
+    storage.set_pump_ac_fail()
 
 def pump_current_callback(channel):
     print("Pump Running")
@@ -36,6 +38,7 @@ def pump_current_callback(channel):
     while PUMP_STATE == 1:
         PUMP_STATE = GPIO.input(PUMP_RUNNING_GPIO)
         print("{:>5}\t{:>5.3f}".format(chan.value, chan.voltage))
+        storage.set_amperage(chan.voltage)
         time.sleep(2)
 
 if __name__ == '__main__':
@@ -52,9 +55,6 @@ if __name__ == '__main__':
             callback=pump_AC_callback, bouncetime=50)
     
     signal.signal(signal.SIGINT, signal_handler)
-
-# Do something!
-# New comment
 
     while True:
         GPIO.output(LED_GPIO, GPIO.HIGH)

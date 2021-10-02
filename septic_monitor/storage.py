@@ -25,6 +25,7 @@ class Keys:
     level_poll = "level:poll"
     level_max = "level:max"
     amperage = "amperage"
+    pump_ac_fail = "pump:acFail"
 
 
 # wait for db
@@ -185,6 +186,20 @@ def get_amperage(duration=None):
         Amperage(datetime.fromtimestamp(ts), v)
         for ts, v in RTS.range(Keys.amperage, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
     ]
+
+
+
+def set_pump_ac_fail(msg=None, ts=None):
+    """
+    Sets a pump AC failure event
+    """    
+    msg = msg or "Pump AC Failed!"
+    RTS.add(
+        Keys.pump_ac_fail,
+        int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
+        msg,
+    )
+    logger.info("%s Pump AC failed: %s", datetime.now(), msg)
 
 
 def get_last_update():
