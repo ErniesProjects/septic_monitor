@@ -3,7 +3,7 @@ SHELL:=/bin/bash
 docker-install:
 	sudo apt update
 	sudo apt-get -y install apt-transport-https ca-certificates curl gnupg lsb-release apache2-utils
-	curl -sSL https://get.docker.com | sh
+	curl -sSL https://get.docker.com | sudo sh
 	sudo usermod -aG docker ${USER}
 	sudo systemctl enable docker
 	./venv/bin/python -m pip install docker-compose
