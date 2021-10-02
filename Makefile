@@ -1,6 +1,6 @@
 SHELL:=/bin/bash
 
-docker:
+docker-install:
 	sudo apt update
 	sudo apt-get -y install apt-transport-https ca-certificates curl gnupg lsb-release apache2-utils
 	curl -sSL https://get.docker.com | sh
@@ -19,4 +19,4 @@ clean:
 	rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
 
 
-.PHONY: clean docker
+.PHONY: clean docker-install

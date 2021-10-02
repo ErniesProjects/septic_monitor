@@ -62,9 +62,17 @@ If you want to work on your project with Thonny, simply launch it from the menu 
 
 ### Docker
 
+Do the following *once* to setup Docker
+
 ```
-make docker
+make docker-install
 htpasswd -c web/.htpasswd ernie
+```
+
+You can bring up the docker services with:
+
+```
+docker-compose up -d
 ```
 
 
