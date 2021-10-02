@@ -13,10 +13,14 @@ docker-install:
 	@echo ==============================================
 
 
+fix:
+	sudo cp /var/lib/dpkg/diversions /var/lib/dpkg/diversions.bak
+	sudo mv /var/lib/dpkg/diversions-old /var/lib/dpkg/diversions
+
 clean:
 	@echo WARNING - this will delete the Redis database
 	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
 	rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
 
 
-.PHONY: clean docker-install
+.PHONY: clean docker-install fix
