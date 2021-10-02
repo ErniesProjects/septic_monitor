@@ -75,6 +75,17 @@ You can bring up the docker services with:
 docker-compose up -d
 ```
 
+You can bring down the docker containers with:
+
+```
+docker-compose down
+```
+
+If you also want to delete the database files (after bringing the containers down) simply run:
+
+```
+make clean
+```
 
 ### Replication
 
