@@ -20,7 +20,7 @@ export default Vue.component('AmpGauge', {
     }),
     methods: {
         async getAmperage() {
-            var r = await axios.get('/api/amperage/');
+            var r = await axios.get('/api/pump/amperage/');
             return r.data;
         },
         async update() {

@@ -38,7 +38,7 @@ def pump_current_callback(channel):
     while PUMP_STATE == 1:
         PUMP_STATE = GPIO.input(PUMP_RUNNING_GPIO)
         print("{:>5}\t{:>5.3f}".format(chan.value, chan.voltage))
-        storage.set_amperage(chan.voltage)
+        storage.set_pump_amperage(chan.voltage)
         time.sleep(2)
 
 if __name__ == '__main__':

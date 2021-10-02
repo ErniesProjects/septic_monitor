@@ -1,7 +1,8 @@
 appendonly.aof
 dump.rdb
-.vscode
 .htpasswd
+.vscode
+.idea
 
 
 # Byte-compiled / optimized / DLL files

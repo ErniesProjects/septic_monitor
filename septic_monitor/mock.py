@@ -24,12 +24,12 @@ def check_level():
 
 def back_data():
     now = datetime.now()
-    level_poll_int = storage.get_level_poll_int()
+    level_poll_int = storage.get_tank_level_poll()
     start = now - timedelta(days=60)
     logger.info("Creating back-data...")
     timestamp = start + timedelta(minutes=level_poll_int)
     for level in itertools.cycle(check_level()):
-        storage.set_level(level, ts=timestamp)
+        storage.set_tank_level(level, ts=timestamp)
         if timestamp < now:
             timestamp = timestamp + timedelta(minutes=5)
         else:
@@ -42,8 +42,8 @@ def main():
         back_data()
 
     while True:
-        storage.set_level(random.choice(range(20, 40)))
-        storage.set_amperage(random.choice(range(1, 14)))
+        storage.set_tank_level(random.choice(range(20, 40)))
+        storage.set_pump_amperage(random.choice(range(1, 14)))
         time.sleep(15)
 
 

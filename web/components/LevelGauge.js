@@ -25,7 +25,7 @@ export default Vue.component('LevelGauge', {
     },
     methods: {
         async getLevel() {
-            var r = await axios.get('/api/level/');
+            var r = await axios.get('/api/tank/level/');
             return r.data;  // wait to refresh gauge before set data attr
         },
         async update() {

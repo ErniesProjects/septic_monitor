@@ -20,7 +20,7 @@ export default Vue.component('LevelChart', {
     },
     methods: {
         async getLevels() {
-            const r = await axios.get(`/api/level/${this.duration}/`);
+            const r = await axios.get(`/api/tank/level/${this.duration}/`);
             return r.data;
         },
         async update() {

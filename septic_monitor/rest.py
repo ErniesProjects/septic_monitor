@@ -9,24 +9,24 @@ app = FastAPI()
 # logging.basicConfig(level=logging.INFO)
 
 
-@app.get("/api/level/")
-async def get_level():
-    return storage.get_level()
+@app.get("/api/tank/level/")
+async def get_tank_level():
+    return storage.get_tank_level()
 
 
-@app.get("/api/level/{duration}/")
-async def get_level_duration(duration):
-    return [{"x": l.timestamp, "y": l.value} for l in storage.get_level(duration=duration)]
+@app.get("/api/tank/level/{duration}/")
+async def get_tank_level_duration(duration):
+    return [{"x": l.timestamp, "y": l.value} for l in storage.get_tank_level(duration=duration)]
 
 
-@app.get("/api/amperage/")
-async def get_amperage():
-    return storage.get_amperage()
+@app.get("/api/pump/amperage/")
+async def get_pump_amperage():
+    return storage.get_pump_amperage()
 
 
-@app.get("/api/amperage/{duration}/")
-async def get_amperage_duration(duration):
-    return [{"x": l.timestamp, "y": l.value} for l in storage.get_amperage(duration=duration)]
+@app.get("/api/pump/amperage/{duration}/")
+async def get_pump_amperage_duration(duration):
+    return [{"x": l.timestamp, "y": l.value} for l in storage.get_pump_amperage(duration=duration)]
 
 
 @app.get("/api/lastupdate/")

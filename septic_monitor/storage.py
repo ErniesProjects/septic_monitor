@@ -21,10 +21,11 @@ logger.info(f"Redis host: {REDIS_HOST}")
 
 class Keys:
     ret_days = "ret_days"
-    level = "level"
-    level_poll = "level:poll"
-    level_max = "level:max"
-    amperage = "amperage"
+    tank_level = "tank:level"
+    tank_level_poll = "tank:level:poll"
+    tank_level_warn = "tank:level:warn"
+    pump_amperage = "pump:amperage"
+    pump_amperage_warn = "pump:amperage:warn"
     pump_ac_fail = "pump:acFail"
 
 
@@ -45,8 +46,8 @@ MS_IN_DAY = 86400000
 MS_IN_HOUR = 3600000
 MS_IN_MINUTE = 60000
 RETENTION_DAYS = int(REDIS.get(Keys.ret_days)) if REDIS.exists(Keys.ret_days) else 30
-LEVEL_POLL_INT = int(REDIS.get(Keys.level_poll)) if REDIS.exists(Keys.level_poll) else 10
-LEVEL_MAX = int(REDIS.get(Keys.level_max)) if REDIS.exists(Keys.level_max) else None
+TANK_LEVEL_POLL = int(REDIS.get(Keys.tank_level_poll)) if REDIS.exists(Keys.tank_level_poll) else 10
+LEVEL_MAX = int(REDIS.get(Keys.tank_level_warn)) if REDIS.exists(Keys.tank_level_warn) else None
 
 
 def create_rts(key, retention):
@@ -58,20 +59,20 @@ def create_rts(key, retention):
 
 
 for rts in (
-    (Keys.level, RETENTION_DAYS * MS_IN_DAY),
-    (Keys.amperage, RETENTION_DAYS * MS_IN_DAY),
+    (Keys.tank_level, RETENTION_DAYS * MS_IN_DAY),
+    (Keys.pump_amperage, RETENTION_DAYS * MS_IN_DAY),
 ):
     create_rts(rts[0], rts[1])
 
 
 @attrs
-class Level:
+class TankLevel:
     timestamp = attrib()
     value = attrib()
 
 
 @attrs
-class Amperage:
+class PumpAmperage:
     timestamp = attrib()
     value = attrib()
 
@@ -84,38 +85,38 @@ def set_retention(days):
     REDIS.set(Keys.ret_days, days)
 
 
-def get_level_poll_int():
-    return LEVEL_POLL_INT
+def get_tank_level_poll():
+    return TANK_LEVEL_POLL
 
 
-def set_level_poll_int(minutes):
-    REDIS.set(Keys.level_poll, minutes)
+def set_tank_level_poll(minutes):
+    REDIS.set(Keys.tank_level_poll, minutes)
 
 
-def get_max_level():
+def get_tank_level_warn():
     return -5  # FIXME
 
 
-def set_level(level, ts=None):
+def set_tank_level(level, ts=None):
     """
     Sets the water level in the db (sensor is zero)
     """
     level = float(0 - abs(level))
     RTS.add(
-        Keys.level,
+        Keys.tank_level,
         int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
         level,
     )
     logger.info("%s Set level: %s cm", datetime.now(), level)
 
 
-def get_level(duration=None):
+def get_tank_level(duration=None):
     """
     Gets the latest level, or a duration of levels (from now)
     """
     if duration is None:
-        ts, v = RTS.get(Keys.level)
-        return Level(datetime.fromtimestamp(ts), round(v, 2))
+        ts, v = RTS.get(Keys.tank_level)
+        return TankLevel(datetime.fromtimestamp(ts), round(v, 2))
     now = datetime.now(pytz.UTC)
     if duration == "hour":
         start = int((now - timedelta(hours=1)).timestamp())
@@ -134,35 +135,35 @@ def get_level(duration=None):
         bucket_size = 15000
     end = int(now.timestamp())
     return [
-        Level(datetime.fromtimestamp(ts), v)
-        for ts, v in RTS.range(Keys.level, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
+        TankLevel(datetime.fromtimestamp(ts), v)
+        for ts, v in RTS.range(Keys.tank_level, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
     ]
 
 
-def get_lowest_level():
-    return min(l.value for l in get_level(duration="all"))
+def get_lowest_tank_level():
+    return min(l.value for l in get_tank_level(duration="all"))
 
 
-def set_amperage(amperage, ts=None):
+def set_pump_amperage(amperage, ts=None):
     """
     Sets the pump amperage in the db
     """
     amperage = float(amperage)
     RTS.add(
-        Keys.amperage,
+        Keys.pump_amperage,
         int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
         amperage,
     )
     logger.info("%s Set amperage: %s", datetime.now(), amperage)
 
 
-def get_amperage(duration=None):
+def get_pump_amperage(duration=None):
     """
     Gets the latest pump amperage, or a duration of amperages (from now)
     """
     if duration is None:
-        ts, v = RTS.get(Keys.amperage)
-        return Amperage(datetime.fromtimestamp(ts), round(v, 2))
+        ts, v = RTS.get(Keys.pump_amperage)
+        return PumpAmperage(datetime.fromtimestamp(ts), round(v, 2))
     now = datetime.now(pytz.UTC)
     if duration == "10min":
         start = int((now - timedelta(minutes=10)).timestamp())
@@ -183,10 +184,9 @@ def get_amperage(duration=None):
         start = 0
         bucket_size = 15000    
     return [
-        Amperage(datetime.fromtimestamp(ts), v)
-        for ts, v in RTS.range(Keys.amperage, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
+        PumpAmperage(datetime.fromtimestamp(ts), v)
+        for ts, v in RTS.range(Keys.pump_amperage, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
     ]
-
 
 
 def set_pump_ac_fail(msg=None, ts=None):
@@ -206,7 +206,7 @@ def get_last_update():
     return max(
         x.timestamp
         for x in (
-            get_level(),
-            get_amperage(),
+            get_tank_level(),
+            get_pump_amperage(),
         )
     )
