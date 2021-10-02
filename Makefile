@@ -16,7 +16,9 @@ docker-install:
 fix:
 	#sudo cp /var/lib/dpkg/diversions /var/lib/dpkg/diversions.bak
 	sudo mv /var/lib/dpkg/diversions /var/lib/dpkg/diversions.old.bak
+	sudo apt-get -f install
 	sudo apt-get -y install apt-transport-https ca-certificates curl gnupg lsb-release apache2-utils
+	
 
 clean:
 	@echo WARNING - this will delete the Redis database
