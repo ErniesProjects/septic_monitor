@@ -9,7 +9,7 @@ services:
     - "/etc/timezone:/etc/timezone"
     environment:
       REDIS_HOST: redis
-      TZ: America/Toronto
+      TZ: America/Winnipeg
   redis:
     build:
       context: .
@@ -20,7 +20,7 @@ services:
     - "./redis/redis.conf:/etc/redis.conf:ro"
     - "./redis/data:/data"
     environment:
-      TZ: America/Toronto
+      TZ: America/Winnipeg
   nginx:
     image: nginx
     volumes:
@@ -29,4 +29,4 @@ services:
     ports:
     - "80:80"
     environment:
-      TZ: America/Toronto
+      TZ: America/Winnipeg
