@@ -13,10 +13,11 @@ docker-install:
 	@echo ==============================================
 
 
-fix:
+fix-seccomp2:
 	curl http://ftp.us.debian.org/debian/pool/main/libs/libseccomp/libseccomp2_2.5.1-1_armhf.deb --output libseccomp2_2.5.1-1_armhf.deb
 	sudo dpkg -i libseccomp2_2.5.1-1_armhf.deb	
 	rm libseccomp2_2.5.1-1_armhf.deb -f
+
 
 clean:
 	@echo WARNING - this will delete the Redis database
