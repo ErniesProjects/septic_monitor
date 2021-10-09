@@ -1,5 +1,5 @@
+import Status from './components/Status.js';
 import LevelGauge from './components/LevelGauge.js';
-import LastUpdate from './components/LastUpdate.js';
 import LevelChart from './components/LevelChart.js';
 import AmpGauge from './components/AmpGauge.js';
 import AmpChart from './components/AmpChart.js';
@@ -44,48 +44,48 @@ new Vue({
                   </v-dialog>
                 </v-toolbar>
 
+                
                 <v-row align="top" justify="center" class="mt-8">
-                    <v-col>
-                        <v-card elevation="2" shaped class="py-8">
-                            <LastUpdate></LastUpdate>
-                        </v-card>
-                    </v-col>
+                    <v-col><Status></Status></v-col>
                     <v-col><LevelGauge></LevelGauge></v-col>
                     <v-col><AmpGauge></AmpGauge></v-col>
                 </v-row>
-
-
-                <div class="mt-12 mb-6 text-center text--secondary"><h2>Tank Levels</h2></div>
-                <div>
-                    <v-tabs v-model="levelTabs">
-                        <v-tab>Hour</v-tab>
-                        <v-tab>Day</v-tab>
-                        <v-tab>Week</v-tab>
-                        <v-tab>Month</v-tab>
-                    </v-tabs>
-
-                    <v-tabs-items v-model="levelTabs">
-                        <v-tab-item><LevelChart duration="hour"></LevelChart></v-tab-item>
-                        <v-tab-item><LevelChart duration="day"></LevelChart></v-tab-item>
-                        <v-tab-item><LevelChart duration="week"></LevelChart></v-tab-item>
-                        <v-tab-item><LevelChart duration="month"></LevelChart></v-tab-item>
-                    </v-tabs-items>
-                </div>
-
-
-                <div class="mt-12 mb-6 text-center text--secondary"><h2>Pump Amperages</h2></div>
-                <div>
-                    <v-tabs v-model="ampTabs">
-                        <v-tab>10 Min</v-tab>
-                        <v-tab>Day</v-tab>
-                    </v-tabs>
-
-                    <v-tabs-items v-model="ampTabs">
-                        <v-tab-item><AmpChart duration="10min"></AmpChart></v-tab-item>
-                        <v-tab-item><AmpChart duration="hour"></AmpChart></v-tab-item>
-                    </v-tabs-items>
-                </div>
-
+                <v-row>
+                    <v-col>
+                        <div class="mt-12 mb-6 text-center text--secondary"><h2>Tank Levels</h2></div>
+                        <div>
+                            <v-tabs v-model="levelTabs">
+                                <v-tab>Hour</v-tab>
+                                <v-tab>Day</v-tab>
+                                <v-tab>Week</v-tab>
+                                <v-tab>Month</v-tab>
+                            </v-tabs>
+                            <v-tabs-items v-model="levelTabs">
+                                <v-tab-item><LevelChart duration="hour"></LevelChart></v-tab-item>
+                                <v-tab-item><LevelChart duration="day"></LevelChart></v-tab-item>
+                                <v-tab-item><LevelChart duration="week"></LevelChart></v-tab-item>
+                                <v-tab-item><LevelChart duration="month"></LevelChart></v-tab-item>
+                            </v-tabs-items>
+                        </div>
+                    </v-col>
+                    <v-col>
+                        <div class="mt-12 mb-6 text-center text--secondary"><h2>Pump Amperages</h2></div>
+                        <div>
+                            <v-tabs v-model="ampTabs">
+                                <v-tab>Hour</v-tab>
+                                <v-tab>Day</v-tab>
+                                <v-tab>Week</v-tab>
+                                <v-tab>Month</v-tab>
+                            </v-tabs>
+                            <v-tabs-items v-model="ampTabs">                                
+                                <v-tab-item><AmpChart duration="hour"></AmpChart></v-tab-item>
+                                <v-tab-item><AmpChart duration="day"></AmpChart></v-tab-item>
+                                <v-tab-item><AmpChart duration="week"></AmpChart></v-tab-item>
+                                <v-tab-item><AmpChart duration="month"></AmpChart></v-tab-item>                                
+                            </v-tabs-items>
+                        </div>
+                    </v-col>
+                </v-row>
 
             </v-container>
           </v-main>
@@ -93,7 +93,7 @@ new Vue({
     `,
     components: {
         SettingsDialog,
-        LastUpdate,
+        Status,
         LevelGauge,
         LevelChart,
         AmpGauge,

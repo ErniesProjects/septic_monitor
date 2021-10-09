@@ -114,6 +114,9 @@ def get_tank_level(duration=None):
     """
     Gets the latest level, or a duration of levels (from now)
     """
+    if not RTS.get(Keys.tank_level):
+        logger.error("No tank level data in database!")
+        return
     if duration is None:
         ts, v = RTS.get(Keys.tank_level)
         return TankLevel(datetime.fromtimestamp(ts), round(v, 2))
@@ -161,14 +164,14 @@ def get_pump_amperage(duration=None):
     """
     Gets the latest pump amperage, or a duration of amperages (from now)
     """
+    if not RTS.get(Keys.pump_amperage):
+        logger.error("No pump amperage in database!")
+        return
     if duration is None:
         ts, v = RTS.get(Keys.pump_amperage)
         return PumpAmperage(datetime.fromtimestamp(ts), round(v, 2))
     now = datetime.now(pytz.UTC)
-    if duration == "10min":
-        start = int((now - timedelta(minutes=10)).timestamp())
-        bucket_size = 1
-    elif duration == "hour":
+    if duration == "hour":
         start = int((now - timedelta(hours=1)).timestamp())
         bucket_size = 50
     elif duration == "day":

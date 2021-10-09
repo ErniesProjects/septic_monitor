@@ -38,7 +38,7 @@ export default Vue.component('AmpChart', {
             data: {
                 datasets: [
                     {
-                        label: "Pump Amperages",
+                        label: "Pump Amperage",
                         data: this.amperages,
                         borderColor: this.colorLine,
                         tension: 0.1,
