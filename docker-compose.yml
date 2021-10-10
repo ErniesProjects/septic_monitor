@@ -10,6 +10,7 @@ services:
     environment:
       REDIS_HOST: redis
       TZ: America/Winnipeg
+    restart: unless-stopped
   redis:
     build:
       context: .
@@ -21,6 +22,7 @@ services:
     - "./redis/data:/data"
     environment:
       TZ: America/Winnipeg
+    restart: unless-stopped
   nginx:
     image: nginx
     volumes:
@@ -30,3 +32,4 @@ services:
     - "80:80"
     environment:
       TZ: America/Winnipeg
+    restart: unless-stopped
