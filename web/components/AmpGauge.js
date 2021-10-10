@@ -1,12 +1,16 @@
 export default Vue.component('AmpGauge', {
     template: `
-    <div>
-        <div class="text-center text--secondary"><h2>Pump Amperage</h2></div>
-        <div class="text-center text--secondary"><h3>{{ amperage }} A</h3></div>
-        <div class="text-center" style="color:#999">{{ lastUpdate }}</div>
-        <div class="text-center" style="color:#999">(warn > {{ maxAmperage }})</div>
-        <canvas id="amp-gauge"></canvas>
-    </div>
+    <v-card shaped outlined height="100%">
+        <v-card-title>Pump Amperage</v-card-title>
+        <v-card-subtitle>
+            <div>Last Reading: {{ amperage }} A</div>
+            <div>Last Update: {{ lastUpdateStr }}</div>
+            <div>Warning Level: {{ maxAmperage }}</div>
+        </v-card-subtitle>
+        <v-card-text>
+            <canvas id="amp-gauge"></canvas>
+        </v-card-text>
+    </v-card>
     `,
     data: () => ({
         maxAmperage: 15,  // FIXME
@@ -18,6 +22,15 @@ export default Vue.component('AmpGauge', {
         colorWarn: "rgb(220, 53, 69)",
         colorBg: "rgb(248, 249, 250)",
     }),
+    computed: {
+        lastUpdateStr: function() {
+            if (this.lastUpdate) {
+                return this.lastUpdate.replace('T', ' @ ');
+            } else {
+                return "N/A";
+            }
+        }        
+    },
     methods: {
         async getAmperage() {
             var r = await axios.get('/api/pump/amperage/');

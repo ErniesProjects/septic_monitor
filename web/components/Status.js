@@ -1,9 +1,10 @@
 export default Vue.component('Status', {	
 	template: `
-    <v-card shaped outlined>
+    <v-card shaped outlined height="100%">
         <v-card-title>Status</v-card-title>
         <v-card-text>
-            <span><b>Last Update:</b> {{ status.lastUpdate }}</span>
+            <v-alert type="error">FOO</v-alert>
+            <v-alert type="success">Last Update: {{ status.lastUpdate.replace('T', ' @ ') }}</v-alert>
         </v-card-text>
     </v-card>
 	`,

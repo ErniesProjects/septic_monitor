@@ -1,12 +1,16 @@
 export default Vue.component('LevelGauge', {
     template: `
-    <div>
-        <div class="text-center text--secondary"><h2>Tank Level</h2></div>
-        <div class="text-center text--secondary"><h3>{{ absLevel }} cm from sensor</h3></div>
-        <div class="text-center" style="color:#999">{{ lastUpdate }}</div>
-        <div class="text-center" style="color:#999">(warn > {{ maxLevel }})</div>
-        <canvas id="level-gauge"></canvas>
-    </div>
+    <v-card shaped outlined height="100%">
+        <v-card-title>Tank Level</v-card-title>
+        <v-card-subtitle>
+            <div>Last Reading: {{ absLevel }} cm</div>
+            <div>Last Update: {{ lastUpdateStr }}</div>
+            <div>Warning Level: {{ maxLevel }}</div>
+        </v-card-subtitle>
+        <v-card-text>
+            <canvas id="level-gauge"></canvas>
+        </v-card-text>
+    </v-card>
     `,
     data: () => ({
         maxLevel: -5,  // FIXME
@@ -21,6 +25,13 @@ export default Vue.component('LevelGauge', {
     computed: {
         absLevel: function() {
             return Math.abs(this.level);
+        },
+        lastUpdateStr: function() {
+            if (this.lastUpdate) {
+                return this.lastUpdate.replace('T', ' @ ');
+            } else {
+                return "N/A";
+            }
         }
     },
     methods: {
