@@ -3,7 +3,7 @@ export default Vue.component('LevelGauge', {
     <v-card shaped outlined height="100%">
         <v-card-title>Tank Level</v-card-title>
         <v-card-subtitle>
-            <div>Last Reading: {{ absLevel }} cm</div>
+            <div>Last Reading: {{ absLevel }} cm from sensor</div>
             <div>Last Update: {{ lastUpdateStr }}</div>
             <div>Warning Level: {{ maxLevel }}</div>
         </v-card-subtitle>

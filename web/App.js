@@ -72,7 +72,7 @@ new Vue({
                     
                     <v-col>
                         <v-card shaped outlined height="100%">
-                            <v-card-title>Tank Levels</v-card-title>
+                            <v-card-title>Pump Amperage</v-card-title>
                             <v-card-text>
                                 <v-tabs v-model="ampTabs">
                                     <v-tab>Hour</v-tab>
