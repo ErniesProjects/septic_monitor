@@ -75,6 +75,12 @@ You can bring up the docker services with:
 docker-compose up -d
 ```
 
+Check that the containers are running with:
+
+```
+docker ps
+```
+
 You can bring down the docker containers with:
 
 ```
