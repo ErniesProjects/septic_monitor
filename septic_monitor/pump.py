@@ -13,9 +13,9 @@ from adafruit_ads1x15.analog_in import AnalogIn
 
 from septic_monitor import storage
 
-PUMP_RUNNING_GPIO = 16
-PUMP_AC_POWER_GPIO = 12
-LED_GPIO = 20
+PUMP_RUNNING_GPIO = 27
+PUMP_AC_POWER_GPIO = 17
+LED_GPIO = 26
 
 i2c = busio.I2C(board.SCL, board.SDA)
 ads = ADS.ADS1015(i2c)
@@ -34,12 +34,15 @@ def pump_current_callback(channel):
     print("{:>5}\t{:>5}".format("-Raw-", "AC Current"))
     
     PUMP_STATE = 1
+    storage.set_pump_amperage(0.0)
     
     while PUMP_STATE == 1:
         PUMP_STATE = GPIO.input(PUMP_RUNNING_GPIO)
         print("{:>5}\t{:>5.3f}".format(chan.value, chan.voltage))
         storage.set_pump_amperage(chan.voltage)
         time.sleep(2)
+        
+    storage.set_pump_amperage(0.0)
 
 if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
