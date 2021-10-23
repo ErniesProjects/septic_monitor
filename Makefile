@@ -3,10 +3,10 @@ SHELL:=/bin/bash
 
 init:
 	sudo apt update
-	sudo apt install i2c-tools python3-venv python3-smbus
+	sudo apt -y install i2c-tools python3-venv python3-smbus python3-testresources
 	python3 -m venv --system-site-packages venv
-	./venv/bin/python -m pip install pip setuptools wheel --upgrade
-
+	./venv/bin/python -m pip install pip setuptools setuptools-rust wheel --upgrade
+	./venv/bin/python -m pip install -e .
 
 docker-install:
 	sudo apt update
