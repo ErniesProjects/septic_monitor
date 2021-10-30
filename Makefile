@@ -15,10 +15,9 @@ docker-install:
 	sudo usermod -aG docker ${USER}
 	sudo systemctl enable docker
 	./venv/bin/python -m pip install docker-compose
-	@echo ==============================================
-	@echo Re-launch your terminal, or run: newgrp docker
-	@echo Ensure you re-activate your venv if necessary
-	@echo ==============================================
+	@echo =================================
+	@echo = Please reboot your machine!!! =
+	@echo =================================
 
 
 fix-seccomp2:
@@ -33,4 +32,4 @@ clean:
 	rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
 
 
-.PHONY: init docker-install fix clean
+.PHONY: init docker-install fix-seccomp2 clean
