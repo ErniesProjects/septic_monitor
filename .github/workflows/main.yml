@@ -1,0 +1,10 @@
+on: [push]
+
+jobs:
+  redis_docker_image:
+    runs-on: ubuntu-latest
+    name: Builds redis docker image
+    steps:
+      - name: Build
+        id: build
+        uses: actions/redis-docker-image.yml
