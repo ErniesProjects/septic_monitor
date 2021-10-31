@@ -1,5 +1,0 @@
-name: 'Build Redis Image'
-description: 'Ensure the redis image will build'
-runs:
-  using: 'docker'
-  image: 'Dockerfile.redis'
