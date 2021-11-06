@@ -79,6 +79,12 @@ You can bring down the docker containers with:
 docker-compose down
 ```
 
+Pull the latest versions of images with:
+
+```
+docker-compose pull
+```
+
 If you also want to delete the database files (after bringing the containers down) simply run:
 
 ```
