@@ -1,9 +1,6 @@
 services:
   rest:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["uvicorn", "septic_monitor.rest:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
+    image: erniesprojects/sepmon_rest
     volumes:
     - "./septic_monitor:/opt/sm/septic_monitor"
     - "/etc/timezone:/etc/timezone"
@@ -12,9 +9,7 @@ services:
       TZ: America/Winnipeg
     restart: unless-stopped
   redis:
-    build:
-      context: .
-      dockerfile: Dockerfile.redis
+    image: erniesprojects/sepmon_redis
     ports:
     - "6379:6379"
     volumes:

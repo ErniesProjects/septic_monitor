@@ -59,6 +59,8 @@ make docker-install
 htpasswd -c web/.htpasswd ernie
 ```
 
+Some images are built and pushed to [dockerhub](https://hub.docker.com/u/erniesprojects) to avoid building on the Pi.
+
 You can bring up the docker services with:
 
 ```
