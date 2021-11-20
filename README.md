@@ -24,31 +24,6 @@ You can install dependencies (defined in the `setup.py` script) using pip.  Agai
 python3 -m pip install -e .
 ```
 
-You can now run your `main.py` script as usual:
-
-```
-python3 septic_monitor/main.py
-```
-
-
-### Ongoing Development
-
-Most of the commands in the "Initial Setup" are only required once.  From now on, if you want to work on your project, simply open a terminal, `cd` into the base of the repo, and activate the `venv`:
-
-```
-cd septic_monitor
-source venv/bin/activate
-```
-
-If you add additional dependencies in `setup.py`, simply run the `python3 -m pip install -e .` command again (while in the repobase directory)
-
-
-### Thonny
-
-If you want to work on your project with Thonny, simply launch it from the menu and open main.py.  You'll have to configure Thonny to use Python from the venv you created:
-
-`Tools -> Options -> Interpreter Tab` then select `Alternative Python 3 interpreter or virtual environment` in the drop-down menu and press `Locate another python executable`.  Use the file browser to find the `venv/bin/python3` file from the root of your repository.  You'll only need to set this up once.
-
 
 ### Docker
 
@@ -60,6 +35,8 @@ htpasswd -c web/.htpasswd ernie
 ```
 
 Some images are built and pushed to [dockerhub](https://hub.docker.com/u/erniesprojects) to avoid building on the Pi.
+
+NOTE: If when building images locally you see apt errors about invalid signatures, it could be due to a date/time bug on some Ubuntu images.  If so, you can run `make fix-seccomp2` to fix this.
 
 You can bring up the docker services with:
 
@@ -90,6 +67,28 @@ If you also want to delete the database files (after bringing the containers dow
 ```
 make clean
 ```
+
+
+
+### Ongoing Development
+
+Most of the commands in the "Initial Setup" are only required once.  From now on, if you want to work on your project, simply open a terminal, `cd` into the base of the repo, and activate the `venv`:
+
+```
+cd septic_monitor
+source venv/bin/activate
+```
+
+If you add additional dependencies in `setup.py`, simply run the `python3 -m pip install -e .` command again (while in the repobase directory)
+
+
+### Thonny
+
+If you want to work on your project with Thonny, simply launch it from the menu and open main.py.  You'll have to configure Thonny to use Python from the venv you created:
+
+`Tools -> Options -> Interpreter Tab` then select `Alternative Python 3 interpreter or virtual environment` in the drop-down menu and press `Locate another python executable`.  Use the file browser to find the `venv/bin/python3` file from the root of your repository.  You'll only need to set this up once.
+
+
 
 ### Replication
 
