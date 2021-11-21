@@ -1,9 +1,6 @@
 services:
   rest:
     image: erniesprojects/sepmon_rest
-    build:
-      context: .
-      dockerfile: Dockerfile.rest
     volumes:
     - "./septic_monitor:/opt/sm/septic_monitor"
     - "/etc/timezone:/etc/timezone"
@@ -12,9 +9,6 @@ services:
       TZ: America/Winnipeg
     restart: unless-stopped
   redis:
-    build:
-      context: .
-      dockerfile: Dockerfile.redis
     image: erniesprojects/sepmon_redis
     ports:
     - "6379:6379"
