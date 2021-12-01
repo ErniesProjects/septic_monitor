@@ -1,7 +1,8 @@
 FROM redis:6
 
 RUN apt update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y install git build-essential libssl-dev
+    DEBIAN_FRONTEND=noninteractive apt-get -y install git build-essential libssl-dev python3-gevent python3-pip && \
+    python3 -m pip install pip setuptools wheel --upgrade
 
 WORKDIR /usr/share
 

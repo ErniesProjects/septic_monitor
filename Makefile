@@ -37,4 +37,11 @@ build:
 	docker build -t erniesprojects/sepmon_redis -f Dockerfile.redis .
 
 
-.PHONY: init docker-install fix-seccomp2 clean build
+
+push:
+	docker push erniesprojects/sepmon_redis
+	docker push erniesprojects/sepmon_rest
+
+
+
+.PHONY: init docker-install fix-seccomp2 clean build push
