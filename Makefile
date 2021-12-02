@@ -32,4 +32,16 @@ clean:
 	rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
 
 
-.PHONY: init docker-install fix-seccomp2 clean
+build:
+	docker build -t erniesprojects/sepmon_rest -f Dockerfile.rest .
+	docker build -t erniesprojects/sepmon_redis -f Dockerfile.redis .
+
+
+
+push:
+	docker push erniesprojects/sepmon_redis
+	docker push erniesprojects/sepmon_rest
+
+
+
+.PHONY: init docker-install fix-seccomp2 clean build push
