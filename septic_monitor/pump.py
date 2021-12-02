@@ -13,6 +13,7 @@ from adafruit_ads1x15.analog_in import AnalogIn
 
 from septic_monitor import storage
 
+V_TO_I_FACTOR = 6
 PUMP_RUNNING_GPIO = 27
 PUMP_AC_POWER_GPIO = 17
 LED_GPIO = 26
@@ -39,7 +40,7 @@ def pump_current_callback(channel):
     while PUMP_STATE == 1:
         PUMP_STATE = GPIO.input(PUMP_RUNNING_GPIO)
         print("{:>5}\t{:>5.3f}".format(chan.value, chan.voltage))
-        storage.set_pump_amperage(chan.voltage)
+        storage.set_pump_amperage(chan.voltage * V_TO_I_FACTOR)
         time.sleep(2)
 
     storage.set_pump_amperage(0.0)
