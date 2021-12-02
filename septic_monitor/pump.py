@@ -5,7 +5,7 @@ import signal
 import sys
 import time
 
-import adafruit_ads1x15.ads1015 as ADS
+import adafruit_ads1x15.ads1115 as ADS
 import board
 import busio
 import RPi.GPIO as GPIO
@@ -18,7 +18,7 @@ PUMP_AC_POWER_GPIO = 17
 LED_GPIO = 26
 
 i2c = busio.I2C(board.SCL, board.SDA)
-ads = ADS.ADS1015(i2c)
+ads = ADS.ADS1115(i2c)
 chan = AnalogIn(ads, ADS.P0)
 
 def signal_handler(sig, frame):
