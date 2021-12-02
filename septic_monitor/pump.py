@@ -32,31 +32,32 @@ def pump_AC_callback(channel):
 def pump_current_callback(channel):
     print("Pump Running")
     print("{:>5}\t{:>5}".format("-Raw-", "AC Current"))
-    
+
     PUMP_STATE = 1
     storage.set_pump_amperage(0.0)
-    
+
     while PUMP_STATE == 1:
         PUMP_STATE = GPIO.input(PUMP_RUNNING_GPIO)
         print("{:>5}\t{:>5.3f}".format(chan.value, chan.voltage))
         storage.set_pump_amperage(chan.voltage)
         time.sleep(2)
-        
+
     storage.set_pump_amperage(0.0)
+    print("Pump off, wrote 0.0 to database")
 
 if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
-    
+
     GPIO.setup(PUMP_RUNNING_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     GPIO.setup(PUMP_AC_POWER_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     GPIO.setup(LED_GPIO, GPIO.OUT)
-    
-    GPIO.add_event_detect(PUMP_RUNNING_GPIO, GPIO.RISING, 
+
+    GPIO.add_event_detect(PUMP_RUNNING_GPIO, GPIO.RISING,
             callback=pump_current_callback, bouncetime=50)
-    
-    GPIO.add_event_detect(PUMP_AC_POWER_GPIO, GPIO.FALLING, 
+
+    GPIO.add_event_detect(PUMP_AC_POWER_GPIO, GPIO.FALLING,
             callback=pump_AC_callback, bouncetime=50)
-    
+
     signal.signal(signal.SIGINT, signal_handler)
 
     while True:
