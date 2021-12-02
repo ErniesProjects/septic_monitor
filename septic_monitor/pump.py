@@ -60,8 +60,14 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGINT, signal_handler)
 
+    count = 0
     while True:
+        if count % 10 == 0:
+            if GPIO.input(PUMP_RUNNING_GPIO) == 0:
+                storage.set_pump_amperage(0.0)
+                print("Pump off, wrote 0.0 to database")
         GPIO.output(LED_GPIO, GPIO.HIGH)
         time.sleep(0.5)
         GPIO.output(LED_GPIO, GPIO.LOW)
         time.sleep(0.5)
+        count += 1
