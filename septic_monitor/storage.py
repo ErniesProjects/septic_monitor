@@ -46,8 +46,12 @@ MS_IN_DAY = 86400000
 MS_IN_HOUR = 3600000
 MS_IN_MINUTE = 60000
 RETENTION_DAYS = int(REDIS.get(Keys.ret_days)) if REDIS.exists(Keys.ret_days) else 30
-TANK_LEVEL_POLL = int(REDIS.get(Keys.tank_level_poll)) if REDIS.exists(Keys.tank_level_poll) else 10
-LEVEL_MAX = int(REDIS.get(Keys.tank_level_warn)) if REDIS.exists(Keys.tank_level_warn) else None
+TANK_LEVEL_POLL = (
+    int(REDIS.get(Keys.tank_level_poll)) if REDIS.exists(Keys.tank_level_poll) else 10
+)
+LEVEL_MAX = (
+    int(REDIS.get(Keys.tank_level_warn)) if REDIS.exists(Keys.tank_level_warn) else None
+)
 
 
 def create_rts(key, retention):
@@ -139,7 +143,13 @@ def get_tank_level(duration=None):
     end = int(now.timestamp())
     return [
         TankLevel(datetime.fromtimestamp(ts), v)
-        for ts, v in RTS.range(Keys.tank_level, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
+        for ts, v in RTS.range(
+            Keys.tank_level,
+            start,
+            "+",
+            aggregation_type="max",
+            bucket_size_msec=bucket_size,
+        )
     ]
 
 
@@ -185,24 +195,29 @@ def get_pump_amperage(duration=None):
         start = int((now - timedelta(days=31)).timestamp())
     elif duration == "all":
         start = 0
-        bucket_size = 15000    
+        bucket_size = 15000
     return [
         PumpAmperage(datetime.fromtimestamp(ts), v)
-        for ts, v in RTS.range(Keys.pump_amperage, start, "+", aggregation_type="max", bucket_size_msec=bucket_size)
+        for ts, v in RTS.range(
+            Keys.pump_amperage,
+            start,
+            "+",
+            aggregation_type="max",
+            bucket_size_msec=bucket_size,
+        )
     ]
 
 
-def set_pump_ac_fail(msg=None, ts=None):
+def set_pump_ac_fail(ts=None):
     """
     Sets a pump AC failure event
-    """    
-    msg = msg or "Pump AC Failed!"
+    """
     RTS.add(
         Keys.pump_ac_fail,
         int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
-        msg,
+        1,
     )
-    logger.info("%s Pump AC failed: %s", datetime.now(), msg)
+    logger.info("%s Pump AC failed", datetime.now())
 
 
 def get_last_update():
