@@ -14,8 +14,12 @@ export default Vue.component('Status', {
 	}),
 	methods: {
 	  async getStatus() {
-		  var r = await axios.get('/api/status/');
-		  this.status =  r.data;
+	      try {
+		      var r = await axios.get('/api/status/');
+		      this.status =  r.data;
+		  } catch {
+		  	  this.status = {warn: ["Unable to contact REST backend!"]};
+		  }
 	  },
 	},
 	async mounted() {
