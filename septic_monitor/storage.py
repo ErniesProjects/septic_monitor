@@ -10,6 +10,9 @@ from redis import Redis
 from redis.exceptions import ConnectionError
 from redistimeseries.client import Client
 
+from septic_monitor import logs
+
+logging.basicConfig(level=logging.INFO, format=logs.LOG_FMT)
 logger = logging.getLogger(__name__)
 
 LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
@@ -111,7 +114,7 @@ def set_tank_level(level, ts=None):
         int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
         level,
     )
-    logger.info("%s Set level: %s cm", datetime.now(), level)
+    logger.info("Set level: %s cm", level)
 
 
 def get_tank_level(duration=None):
@@ -167,7 +170,7 @@ def set_pump_amperage(amperage, ts=None):
         int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
         amperage,
     )
-    logger.info("%s Set amperage: %s", datetime.now(), amperage)
+    logger.info("Set amperage: %s", amperage)
 
 
 def get_pump_amperage(duration=None):
