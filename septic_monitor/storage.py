@@ -1,11 +1,11 @@
-import os
 import logging
-import pytz
-import time
+import os
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 
-from attr import attrs, attrib
+import pytz
+from attr import attrib, attrs
 from redis import Redis
 from redis.exceptions import ConnectionError
 from redistimeseries.client import Client
@@ -26,7 +26,7 @@ class Keys:
     tank_level_warn = "tank:level:warn"
     pump_amperage = "pump:amperage"
     pump_amperage_warn = "pump:amperage:warn"
-    pump_ac_fail = "pump:acFail"
+    pump_ac_state = "pump:ac:state"
 
 
 # wait for db
@@ -208,16 +208,16 @@ def get_pump_amperage(duration=None):
     ]
 
 
-def set_pump_ac_fail(ts=None):
+def set_pump_ac_state(ac_state, ts=None):
     """
-    Sets a pump AC failure event
+    Sets a pump AC state (0/1)
     """
     RTS.add(
-        Keys.pump_ac_fail,
+        Keys.pump_ac_state,
         int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
-        1,
+        ac_state,
     )
-    logger.info("%s Pump AC failed", datetime.now())
+    logger.info("Set pump AC state: %s", ac_state)
 
 
 def get_last_update():
