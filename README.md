@@ -18,7 +18,7 @@ source venv/bin/activate
 
 You'll see a `(venv)` to the left of your prompt in the terminal, to let you know the venv is active.
 
-You can install dependencies (defined in the `setup.py` script) using pip.  Again, you only have to do this once (or if you add new dependencies).  Make sure you always do this with the venv activated!
+If you modify `setup.py` and add new dependencies, they can be installed using pip.  Make sure you always do this with the venv activated!
 
 ```
 python3 -m pip install -e .

@@ -5,8 +5,8 @@ init:
 	sudo apt update
 	sudo apt -y install i2c-tools python3-venv python3-smbus python3-testresources
 	python3 -m venv --system-site-packages venv
-	./venv/bin/python -m pip install pip setuptools setuptools-rust wheel --upgrade
-	./venv/bin/python -m pip install -e .
+	./venv/bin/python -m pip install pip setuptools setuptools-rust wheel --upgrade --no-cache-dir
+	./venv/bin/python -m pip install --no-cache-dir -e .
 
 docker-install:
 	sudo apt update
