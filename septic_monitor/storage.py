@@ -22,6 +22,8 @@ REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 logger.info(f"Redis host: {REDIS_HOST}")
 
 
+
+
 class Keys:
     ret_days = "ret_days"
     tank_level = "tank:level"
@@ -55,6 +57,19 @@ TANK_LEVEL_POLL = (
 LEVEL_MAX = (
     int(REDIS.get(Keys.tank_level_warn)) if REDIS.exists(Keys.tank_level_warn) else None
 )
+LAST_UPDATE_WARN_MINS = 5
+
+
+class INFO:
+    last_update = "Last update within {} minutes".format(LAST_UPDATE_WARN_MINS)
+    tank_level = "Tank level within acceptible range"
+    pump_ac_state = "Pump AC is on"
+
+
+class WARN:
+    last_update = "No update within {} minutes!".format(LAST_UPDATE_WARN_MINS)
+    tank_level = "Tank level exceeded max safe distance!"
+    pump_ac_state = "Pump AC is off!"
 
 
 def create_rts(key, retention):
@@ -101,7 +116,7 @@ def set_tank_level_poll(minutes):
 
 
 def get_tank_level_warn():
-    return -5  # FIXME
+    return - 5  # FIXME
 
 
 def set_tank_level(level, ts=None):
@@ -121,6 +136,7 @@ def get_tank_level(duration=None):
     """
     Gets the latest level, or a duration of levels (from now)
     """
+    return TankLevel(datetime.now(), -10.2)  # FIXME, placeholder until sensor working
     if not RTS.get(Keys.tank_level):
         logger.error("No tank level data in database!")
         return
@@ -223,6 +239,10 @@ def set_pump_ac_state(ac_state, ts=None):
     logger.info("Set pump AC state: %s", ac_state)
 
 
+def get_pump_ac_state():
+    print(Keys.pump_ac_state)
+    return RTS.get(Keys.pump_ac_state)
+
 def get_last_update():
     return max(
         x.timestamp
@@ -231,3 +251,32 @@ def get_last_update():
             get_pump_amperage(),
         )
     )
+
+
+def status():
+    info = []
+    warn = []
+
+    last_update = get_last_update()
+    if (datetime.now() - last_update) > timedelta(minutes=5):  # FIXME, get mins from db
+        warn.append(WARN.last_update)
+    else:
+        info.append(INFO.last_update)
+
+    tank_level = get_tank_level()
+    tank_level_warn = get_tank_level_warn()
+    if tank_level.value > tank_level_warn:
+        warn.append(WARN.tank_level)
+    else:
+        info.append(INFO.tank_level)
+
+    if int(get_pump_ac_state()[1]) == 1:
+        info.append(INFO.pump_ac_state)
+    else:
+        warn.append(WARN.pump_ac_state)
+
+    return {
+        "info": sorted(info),
+        "warn": sorted(warn),
+    }
+    

@@ -10,10 +10,8 @@ app = FastAPI()
 
 
 @app.get("/api/status/")
-async def lastupdate():
-    return {
-        "lastUpdate": storage.get_last_update()
-    }
+async def lastupdate():    
+    return storage.status()
         
 
 @app.get("/api/tank/level/")
