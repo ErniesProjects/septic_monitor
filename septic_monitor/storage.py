@@ -137,8 +137,7 @@ def set_tank_level(level, ts=None):
 def get_tank_level(duration=None):
     """
     Gets the latest level, or a duration of levels (from now)
-    """
-    return TankLevel(datetime.now(), -10.2)  # FIXME, placeholder until sensor working
+    """    
     if not RTS.get(Keys.tank_level):
         logger.error("No tank level data in database!")
         return
@@ -242,8 +241,7 @@ def set_pump_ac_state(ac_state, ts=None):
 
 
 def get_pump_ac_state():
-    print(Keys.pump_ac_state)
-    return RTS.get(Keys.pump_ac_state)
+    return RTS.get(Keys.pump_ac_state)  # FIXME, should return a class
 
 
 def status():

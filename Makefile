@@ -1,9 +1,11 @@
 SHELL:=/bin/bash
 
 
+.PHONY: init docker-install fix-seccomp2 mock clean build-rest build-redis push-rest push-redis
+
 init:
 	sudo apt update
-	sudo apt -y install i2c-tools python3-venv python3-smbus python3-testresources
+	sudo apt -y install i2c-tools python3-venv python3-smbus python3-testresources python3-numpy python3-scipy
 	python3 -m venv --system-site-packages venv
 	./venv/bin/python -m pip install pip setuptools setuptools-rust wheel --upgrade --no-cache-dir
 	./venv/bin/python -m pip install --no-cache-dir -e .
@@ -47,5 +49,9 @@ push-redis:
 	docker push erniesprojects/sepmon_redis
 
 
+mock:
+	sudo apt -y install python3-numpy python3-scipy
+	./venv/bin/python septic_monitor/mock.py
 
-.PHONY: init docker-install fix-seccomp2 clean build-rest build-redis push-rest push-redis
+
+
