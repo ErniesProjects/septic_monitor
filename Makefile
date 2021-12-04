@@ -30,6 +30,7 @@ clean:
 	@echo WARNING - this will delete the Redis database
 	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
 	sudo rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
+	sudo find septic_monitor -type f -name "*.pyc" -delete
 
 
 build-rest:
