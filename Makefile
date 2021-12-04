@@ -29,19 +29,22 @@ fix-seccomp2:
 clean:
 	@echo WARNING - this will delete the Redis database
 	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
-	rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
+	sudo rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
 
 
-build:
+build-rest:
 	docker build -t erniesprojects/sepmon_rest -f Dockerfile.rest .
+
+build-redis:
 	docker build -t erniesprojects/sepmon_redis -f Dockerfile.redis .
 
 
-
-push:
-	docker push erniesprojects/sepmon_redis
+push-rest:
 	docker push erniesprojects/sepmon_rest
 
+push-redis:
+	docker push erniesprojects/sepmon_redis
 
 
-.PHONY: init docker-install fix-seccomp2 clean build push
+
+.PHONY: init docker-install fix-seccomp2 clean build-rest build-redis push-rest push-redis

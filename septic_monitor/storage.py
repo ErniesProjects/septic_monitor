@@ -69,8 +69,10 @@ class INFO:
 class WARN:
     last_update = "No update within {} minutes!".format(LAST_UPDATE_WARN_MINS)
     tank_level = "Tank level exceeded max safe distance!"
+    tank_level_unavail = "Tank level data unavailable"
     pump_ac_state = "Pump AC is off!"
-
+    pump_ac_state_unavail = "Pump AC state data unavailable"
+    
 
 def create_rts(key, retention):
     try:
@@ -243,37 +245,28 @@ def get_pump_ac_state():
     print(Keys.pump_ac_state)
     return RTS.get(Keys.pump_ac_state)
 
-def get_last_update():
-    return max(
-        x.timestamp
-        for x in (
-            get_tank_level(),
-            get_pump_amperage(),
-        )
-    )
-
 
 def status():
     info = []
     warn = []
 
-    last_update = get_last_update()
-    if (datetime.now() - last_update) > timedelta(minutes=5):  # FIXME, get mins from db
-        warn.append(WARN.last_update)
-    else:
-        info.append(INFO.last_update)
+    try:
+        tank_level = get_tank_level()
+        tank_level_warn = get_tank_level_warn()
+        if tank_level.value > tank_level_warn:
+            warn.append(WARN.tank_level)
+        else:
+            info.append(INFO.tank_level)
+    except:
+        warn.append(WARN.tank_level_unavail)
 
-    tank_level = get_tank_level()
-    tank_level_warn = get_tank_level_warn()
-    if tank_level.value > tank_level_warn:
-        warn.append(WARN.tank_level)
-    else:
-        info.append(INFO.tank_level)
-
-    if int(get_pump_ac_state()[1]) == 1:
-        info.append(INFO.pump_ac_state)
-    else:
-        warn.append(WARN.pump_ac_state)
+    try:
+        if int(get_pump_ac_state()[1]) == 1:
+            info.append(INFO.pump_ac_state)
+        else:
+            warn.append(WARN.pump_ac_state)
+    except:
+        warn.append(WARN.pump_ac_state_unavail)
 
     return {
         "info": sorted(info),
