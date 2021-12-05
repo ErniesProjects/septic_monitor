@@ -1,5 +1,4 @@
 #Read pump AC current while pump is running
-#Monitors 120VAC powering pump
 
 import signal
 import sys
@@ -15,7 +14,6 @@ from septic_monitor import storage
 
 V_TO_I_FACTOR = 6
 PUMP_RUNNING_GPIO = 27
-PUMP_AC_POWER_GPIO = 17
 LED_GPIO = 26
 
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -25,10 +23,6 @@ chan = AnalogIn(ads, ADS.P0)
 def signal_handler(sig, frame):
     GPIO.cleanup()
     sys.exit(0)
-
-def pump_AC_callback(channel):
-    print("Pump AC Fail")
-    storage.set_pump_ac_fail()
 
 def pump_current_callback(channel):
     print("Pump Running")
@@ -47,17 +41,14 @@ def pump_current_callback(channel):
     print("Pump off, wrote 0.0 to database")
 
 if __name__ == '__main__':
+    
     GPIO.setmode(GPIO.BCM)
 
     GPIO.setup(PUMP_RUNNING_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(PUMP_AC_POWER_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     GPIO.setup(LED_GPIO, GPIO.OUT)
 
     GPIO.add_event_detect(PUMP_RUNNING_GPIO, GPIO.RISING,
             callback=pump_current_callback, bouncetime=50)
-
-    GPIO.add_event_detect(PUMP_AC_POWER_GPIO, GPIO.FALLING,
-            callback=pump_AC_callback, bouncetime=50)
 
     signal.signal(signal.SIGINT, signal_handler)
 
