@@ -1,7 +1,7 @@
 SHELL:=/bin/bash
 
 
-.PHONY: init docker-install fix-seccomp2 mock clean build-rest build-redis push-rest push-redis
+.PHONY: init docker-install docker-config fix-seccomp2 mock clean build-rest build-redis push-rest push-redis
 
 init:
 	sudo apt update
@@ -20,6 +20,12 @@ docker-install:
 	@echo =================================
 	@echo = Please reboot your machine!!! =
 	@echo =================================
+
+
+docker-config:
+	sudo mkdir /etc/docker -p
+	sudo cp daemon.json /etc/docker/daemon.json
+	sudo systemctl restart docker
 
 
 fix-seccomp2:

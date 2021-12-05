@@ -128,7 +128,7 @@ def set_tank_level(level, ts=None):
     level = float(0 - abs(level))
     RTS.add(
         Keys.tank_level,
-        int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
+        "*",
         level,
     )
     logger.info("Set level: %s cm", level)
@@ -143,7 +143,7 @@ def get_tank_level(duration=None):
         return
     if duration is None:
         ts, v = RTS.get(Keys.tank_level)
-        return TankLevel(datetime.fromtimestamp(ts), round(v, 2))
+        return TankLevel(datetime.fromtimestamp(ts/1000.0), round(v, 2))
     now = datetime.now(pytz.UTC)
     if duration == "hour":
         start = int((now - timedelta(hours=1)).timestamp())
@@ -160,9 +160,8 @@ def get_tank_level(duration=None):
     elif duration == "all":
         start = 0
         bucket_size = 15000
-    end = int(now.timestamp())
     return [
-        TankLevel(datetime.fromtimestamp(ts), v)
+        TankLevel(datetime.fromtimestamp(ts/1000.0), v)
         for ts, v in RTS.range(
             Keys.tank_level,
             start,
@@ -184,7 +183,7 @@ def set_pump_amperage(amperage, ts=None):
     amperage = float(amperage)
     RTS.add(
         Keys.pump_amperage,
-        int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
+        "*",
         amperage,
     )
     logger.info("Set amperage: %s", amperage)
@@ -199,25 +198,25 @@ def get_pump_amperage(duration=None):
         return
     if duration is None:
         ts, v = RTS.get(Keys.pump_amperage)
-        return PumpAmperage(datetime.fromtimestamp(ts), round(v, 2))
+        return PumpAmperage(datetime.fromtimestamp(ts/1000.0), round(v, 2))
     now = datetime.now(pytz.UTC)
     if duration == "hour":
-        start = int((now - timedelta(hours=1)).timestamp())
+        start = int((now - timedelta(hours=1)).timestamp() * 1000)
         bucket_size = 50
     elif duration == "day":
-        start = int((now - timedelta(days=1)).timestamp())
+        start = int((now - timedelta(days=1)).timestamp() * 1000)
         bucket_size = 1000
     elif duration == "week":
-        start = int((now - timedelta(days=7)).timestamp())
+        start = int((now - timedelta(days=7)).timestamp() * 1000)
         bucket_size = 5000
     elif duration == "month":
         bucket_size = 15000
-        start = int((now - timedelta(days=31)).timestamp())
+        start = int((now - timedelta(days=31)).timestamp() * 1000)
     elif duration == "all":
         start = 0
         bucket_size = 15000
     return [
-        PumpAmperage(datetime.fromtimestamp(ts), v)
+        PumpAmperage(datetime.fromtimestamp(ts/1000.0), v)
         for ts, v in RTS.range(
             Keys.pump_amperage,
             start,
@@ -234,7 +233,7 @@ def set_pump_ac_state(ac_state, ts=None):
     """
     RTS.add(
         Keys.pump_ac_state,
-        int(ts.timestamp()) if ts else int(datetime.now(pytz.UTC).timestamp()),
+        "*",
         ac_state,
     )
     logger.info("Set pump AC state: %s", ac_state)
