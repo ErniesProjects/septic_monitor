@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -59,20 +60,6 @@ LEVEL_MAX = (
 )
 LAST_UPDATE_WARN_MINS = 5
 
-
-class INFO:
-    last_update = "Last update within {} minutes".format(LAST_UPDATE_WARN_MINS)
-    tank_level = "Tank level within acceptible range"
-    pump_ac_state = "Pump AC is on"
-
-
-class WARN:
-    last_update = "No update within {} minutes!".format(LAST_UPDATE_WARN_MINS)
-    tank_level = "Tank level exceeded max safe distance!"
-    tank_level_unavail = "Tank level data unavailable"
-    pump_ac_state = "Pump AC is off!"
-    pump_ac_state_unavail = "Pump AC state data unavailable"
-    
 
 def create_rts(key, retention):
     try:
@@ -251,19 +238,27 @@ def status():
         tank_level = get_tank_level()
         tank_level_warn = get_tank_level_warn()
         if tank_level.value > tank_level_warn:
-            warn.append(WARN.tank_level)
+            warn.append("Tank level exceeded max!")
         else:
-            info.append(INFO.tank_level)
+            info.append("Tank level OK")
     except:
-        warn.append(WARN.tank_level_unavail)
+        warn.append("Tank level data unavailable")
 
     try:
         if int(get_pump_ac_state()[1]) == 1:
-            info.append(INFO.pump_ac_state)
+            info.append("Pump Power OK")
         else:
-            warn.append(WARN.pump_ac_state)
+            warn.append("Pump Power Loss!")
     except:
-        warn.append(WARN.pump_ac_state_unavail)
+        warn.append("Pump Power State Unavailable!")
+
+
+    total, used, free = shutil.disk_usage(".")
+    used_percent = int(used / total * 100)
+    if used_percent > 90:
+        warn.append("Disk Usage Exceeded 90%!")
+    else:
+        info.append(f"Disk Usage OK ({used_percent}% used)")
 
     return {
         "info": sorted(info),
