@@ -121,6 +121,27 @@ def set_tank_level(level, ts=None):
     logger.info("Set level: %s cm", level)
 
 
+
+def duration_to_start_and_bucket(duration):
+    now = datetime.now()
+    if duration == "hour":
+        start = now - timedelta(hours=1)
+        bucket_size = 10000
+    elif duration == "day":
+        start = now - timedelta(days=1)
+        bucket_size = 50000
+    elif duration == "week":
+        start = now - timedelta(days=7)
+        bucket_size = 500000
+    elif duration == "month":
+        bucket_size = 2000000
+        start = now - timedelta(days=31)
+    elif duration == "all":
+        start = 0  # FIXME
+        bucket_size = 2000000
+    return int(start.timestamp() * 1000), bucket_size
+
+
 def get_tank_level(duration=None):
     """
     Gets the latest level, or a duration of levels (from now)
@@ -131,22 +152,7 @@ def get_tank_level(duration=None):
     if duration is None:
         ts, v = RTS.get(Keys.tank_level)
         return TankLevel(datetime.fromtimestamp(ts/1000.0), round(v, 2))
-    now = datetime.now(pytz.UTC)
-    if duration == "hour":
-        start = int((now - timedelta(hours=1)).timestamp())
-        bucket_size = 50
-    elif duration == "day":
-        start = int((now - timedelta(days=1)).timestamp())
-        bucket_size = 1000
-    elif duration == "week":
-        start = int((now - timedelta(days=7)).timestamp())
-        bucket_size = 5000
-    elif duration == "month":
-        bucket_size = 15000
-        start = int((now - timedelta(days=31)).timestamp())
-    elif duration == "all":
-        start = 0
-        bucket_size = 15000
+    start, bucket_size = duration_to_start_and_bucket(duration)
     return [
         TankLevel(datetime.fromtimestamp(ts/1000.0), v)
         for ts, v in RTS.range(
@@ -186,22 +192,7 @@ def get_pump_amperage(duration=None):
     if duration is None:
         ts, v = RTS.get(Keys.pump_amperage)
         return PumpAmperage(datetime.fromtimestamp(ts/1000.0), round(v, 2))
-    now = datetime.now(pytz.UTC)
-    if duration == "hour":
-        start = int((now - timedelta(hours=1)).timestamp() * 1000)
-        bucket_size = 50
-    elif duration == "day":
-        start = int((now - timedelta(days=1)).timestamp() * 1000)
-        bucket_size = 1000
-    elif duration == "week":
-        start = int((now - timedelta(days=7)).timestamp() * 1000)
-        bucket_size = 5000
-    elif duration == "month":
-        bucket_size = 15000
-        start = int((now - timedelta(days=31)).timestamp() * 1000)
-    elif duration == "all":
-        start = 0
-        bucket_size = 15000
+    start, bucket_size = duration_to_start_and_bucket(duration)
     return [
         PumpAmperage(datetime.fromtimestamp(ts/1000.0), v)
         for ts, v in RTS.range(
@@ -238,11 +229,11 @@ def status():
         tank_level = get_tank_level()
         tank_level_warn = get_tank_level_warn()
         if tank_level.value > tank_level_warn:
-            warn.append("Tank level exceeded max!")
+            warn.append("Tank Level Exceeded Max!")
         else:
-            info.append("Tank level OK")
+            info.append("Tank Level OK")
     except:
-        warn.append("Tank level data unavailable")
+        warn.append("Tank Level Data Unavailable")
 
     try:
         if int(get_pump_ac_state()[1]) == 1:
