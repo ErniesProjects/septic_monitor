@@ -23,8 +23,6 @@ REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 logger.info(f"Redis host: {REDIS_HOST}")
 
 
-
-
 class Keys:
     ret_days = "ret_days"
     tank_level = "tank:level"
@@ -48,9 +46,13 @@ while True:
         time.sleep(5)
 
 
-MS_IN_DAY = 86400000
-MS_IN_HOUR = 3600000
-MS_IN_MINUTE = 60000
+# in milliseconds
+SECOND = 1000
+MINUTE = 60 * SECOND
+HOUR = 60 * MINUTE
+DAY = 24 * HOUR
+
+
 RETENTION_DAYS = int(REDIS.get(Keys.ret_days)) if REDIS.exists(Keys.ret_days) else 30
 TANK_LEVEL_POLL = (
     int(REDIS.get(Keys.tank_level_poll)) if REDIS.exists(Keys.tank_level_poll) else 10
@@ -70,8 +72,8 @@ def create_rts(key, retention):
 
 
 for rts in (
-    (Keys.tank_level, RETENTION_DAYS * MS_IN_DAY),
-    (Keys.pump_amperage, RETENTION_DAYS * MS_IN_DAY),
+    (Keys.tank_level, RETENTION_DAYS * DAY),
+    (Keys.pump_amperage, RETENTION_DAYS * DAY),
 ):
     create_rts(rts[0], rts[1])
 
@@ -108,7 +110,7 @@ def get_tank_level_warn():
     return - 5  # FIXME
 
 
-def set_tank_level(level, ts=None):
+def set_tank_level(level):
     """
     Sets the water level in the db (sensor is zero)
     """
@@ -123,23 +125,23 @@ def set_tank_level(level, ts=None):
 
 
 def duration_to_start_and_bucket(duration):
-    now = datetime.now()
+    now, _ = REDIS.time()
     if duration == "hour":
-        start = now - timedelta(hours=1)
-        bucket_size = 10000
+        start = now - HOUR
+        bucket_size = MINUTE
     elif duration == "day":
-        start = now - timedelta(days=1)
-        bucket_size = 50000
+        start = now - DAY
+        bucket_size = 10 * MINUTE
     elif duration == "week":
-        start = now - timedelta(days=7)
-        bucket_size = 500000
+        start = now - (DAY * 7)
+        bucket_size = HOUR
     elif duration == "month":
-        bucket_size = 2000000
-        start = now - timedelta(days=31)
+        start = now - (DAY * 30)
+        bucket_size = 6 * HOUR
     elif duration == "all":
-        start = 0  # FIXME
-        bucket_size = 2000000
-    return int(start.timestamp() * 1000), bucket_size
+        start = 0
+        bucket_size = DAY
+    return start, bucket_size
 
 
 def get_tank_level(duration=None):
@@ -169,7 +171,7 @@ def get_lowest_tank_level():
     return min(l.value for l in get_tank_level(duration="all"))
 
 
-def set_pump_amperage(amperage, ts=None):
+def set_pump_amperage(amperage):
     """
     Sets the pump amperage in the db
     """
@@ -205,7 +207,7 @@ def get_pump_amperage(duration=None):
     ]
 
 
-def set_pump_ac_state(ac_state, ts=None):
+def set_pump_ac_state(ac_state):
     """
     Sets a pump AC state (0/1)
     """
