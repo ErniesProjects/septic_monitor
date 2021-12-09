@@ -1,3 +1,5 @@
+# 20x4 I2C LCD module for septic tank monitor
+
 import time
 
 from RPLCD.i2c import CharLCD
