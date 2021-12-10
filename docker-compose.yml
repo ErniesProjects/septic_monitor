@@ -1,11 +1,11 @@
 services:
-  redis:
-    image: erniesprojects/sepmon_redis
+  db:
+    image: "timescale/timescaledb:latest-pg12"
     ports:
-    - "127.0.0.1:6379:6379"
+    - "127.0.0.1:5432:5432"
     volumes:
-    - "./redis/redis.conf:/etc/redis.conf:ro"
-    - "./redis/data:/data"
+    - "pgdata:/var/lib/postgresql/data"
+    - "./postgresql.conf:/var/lib/postgresql/data/postgresql.conf"
     env_file: env
     restart: unless-stopped
   rest:
@@ -16,7 +16,7 @@ services:
     env_file: env
     restart: unless-stopped
     depends_on:
-    - "redis"
+    - "db"
   nginx:
     image: nginx
     volumes:
@@ -27,7 +27,7 @@ services:
     env_file: env
     restart: unless-stopped
     depends_on:
-    - "rest"
+    - "db"
   pump_v:
     image: erniesprojects/sepmon_rest
     volumes:
@@ -38,15 +38,8 @@ services:
     privileged: true
     command: ["python", "/opt/sm/septic_monitor/pump_v.py"]
     depends_on:
-    - "redis"
-  pump_i:
-    image: erniesprojects/sepmon_rest
-    volumes:
-    - "./septic_monitor:/opt/sm/septic_monitor"
-    - "/etc/timezone:/etc/timezone"
-    env_file: env
-    restart: unless-stopped
-    privileged: true
-    command: ["python", "/opt/sm/septic_monitor/pump_i.py"]
-    depends_on:
-    - "redis"
+    - "db"
+  
+
+volumes:
+  pgdata:

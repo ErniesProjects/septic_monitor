@@ -5,11 +5,10 @@ import sys
 import time
 from datetime import datetime, timedelta, timezone
 
+import psycopg2
+from psycopg2.errors import DuplicateTable
 import pytz
 from attr import attrib, attrs
-from redis import Redis
-from redis.exceptions import ConnectionError
-from redistimeseries.client import Client
 
 from septic_monitor import logs
 
@@ -19,63 +18,12 @@ logger = logging.getLogger(__name__)
 LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
 
 
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-logger.info(f"Redis host: {REDIS_HOST}")
+POSTGRES_HOST = os.getenv("POSTGRES_HOST")
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_DB = os.getenv("POSTGRES_DB")
+CONN = psycopg2.connect(f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DB}")
 
-
-class Keys:
-    ret_days = "ret_days"
-    tank_level = "tank:level"
-    tank_level_poll = "tank:level:poll"
-    tank_level_warn = "tank:level:warn"
-    pump_amperage = "pump:amperage"
-    pump_amperage_warn = "pump:amperage:warn"
-    pump_ac_state = "pump:ac:state"
-
-
-# wait for db
-while True:
-    try:
-        REDIS = Redis(host=REDIS_HOST)
-        REDIS.ping()
-        RTS = Client(host=REDIS_HOST)
-        logger.info("Connected to Redis!")
-        break
-    except Exception as e:
-        logger.error(f"Unable to connect to Redis: {e}")
-        time.sleep(5)
-
-
-# in milliseconds
-SECOND = 1000
-MINUTE = 60 * SECOND
-HOUR = 60 * MINUTE
-DAY = 24 * HOUR
-
-
-RETENTION_DAYS = int(REDIS.get(Keys.ret_days)) if REDIS.exists(Keys.ret_days) else 30
-TANK_LEVEL_POLL = (
-    int(REDIS.get(Keys.tank_level_poll)) if REDIS.exists(Keys.tank_level_poll) else 10
-)
-LEVEL_MAX = (
-    int(REDIS.get(Keys.tank_level_warn)) if REDIS.exists(Keys.tank_level_warn) else None
-)
-LAST_UPDATE_WARN_MINS = 5
-
-
-def create_rts(key, retention):
-    try:
-        RTS.create(key, retention=retention, duplicate_policy="last")
-    except Exception as e:
-        if "key already exists" not in str(e).casefold():
-            raise
-
-
-for rts in (
-    (Keys.tank_level, RETENTION_DAYS * DAY),
-    (Keys.pump_amperage, RETENTION_DAYS * DAY),
-):
-    create_rts(rts[0], rts[1])
 
 
 @attrs
@@ -88,173 +36,91 @@ class TankLevel:
 class PumpAmperage:
     timestamp = attrib()
     value = attrib()
+    
+
+CREATE_TABLE = "CREATE TABLE {} (time TIMESTAMPTZ NOT NULL, {} DOUBLE PRECISION);"
+CREATE_HYPERTABLE = "SELECT create_hypertable('{}', 'time');"
+for table in ("tank_level", "pump_amperage", "pump_ac_state"):    
+    with CONN.cursor() as cursor:
+        try:
+            cursor.execute(CREATE_TABLE.format(table, table.partition("_")[2]))            
+        except Exception as e:
+            if not isinstance(e, DuplicateTable):
+                print(e)
+        CONN.commit()
+    with CONN.cursor() as cursor:
+        try:        
+            cursor.execute(CREATE_HYPERTABLE.format(table))
+            CONN.commit()
+        except Exception as e:
+            if not isinstance(e, DuplicateTable):
+                print(e)    
+        CONN.commit()
 
 
-def get_retention():
-    return RETENTION_DAYS
+BUCKETS = {
+    "hour": "2 minutes",
+    "day": "20 minutes",
+    "week": "1 hours",
+    "month": "1 hours",
+}
 
 
-def set_retention(days):
-    REDIS.set(Keys.ret_days, days)
-
-
-def get_tank_level_poll():
-    return TANK_LEVEL_POLL
-
-
-def set_tank_level_poll(minutes):
-    REDIS.set(Keys.tank_level_poll, minutes)
-
-
-def get_tank_level_warn():
-    return - 5  # FIXME
-
+def duration_to_args(duration):
+    hours = 1 if duration == "hour" else 0
+    days = 1 if duration == "day" else 0
+    weeks = 1 if duration == "week" else 0
+    weeks = 4 if duration == "month" else 0
+    return hours, days, weeks
 
 def set_tank_level(level):
-    """
-    Sets the water level in the db (sensor is zero)
-    """
-    level = float(0 - abs(level))
-    RTS.add(
-        Keys.tank_level,
-        "*",
-        level,
-    )
-    logger.info("Set level: %s cm", level)
-
-
-
-def duration_to_start_and_bucket(duration):
-    now, _ = REDIS.time()
-    if duration == "hour":
-        start = now - HOUR
-        bucket_size = MINUTE
-    elif duration == "day":
-        start = now - DAY
-        bucket_size = 10 * MINUTE
-    elif duration == "week":
-        start = now - (DAY * 7)
-        bucket_size = HOUR
-    elif duration == "month":
-        start = now - (DAY * 30)
-        bucket_size = 6 * HOUR
-    elif duration == "all":
-        start = 0
-        bucket_size = DAY
-    return start, bucket_size
-
+    level = 0 - abs(level)
+    with CONN.cursor() as cursor:
+        cursor.execute("INSERT INTO tank_level (time, level) VALUES (now(), %s)", (level,))    
+    CONN.commit()
+    logger.info("Set tank level: %s", level)
 
 def get_tank_level(duration=None):
-    """
-    Gets the latest level, or a duration of levels (from now)
-    """    
-    if not RTS.get(Keys.tank_level):
-        logger.error("No tank level data in database!")
-        return
-    if duration is None:
-        ts, v = RTS.get(Keys.tank_level)
-        return TankLevel(datetime.fromtimestamp(ts/1000.0), round(v, 2))
-    start, bucket_size = duration_to_start_and_bucket(duration)
-    return [
-        TankLevel(datetime.fromtimestamp(ts/1000.0), v)
-        for ts, v in RTS.range(
-            Keys.tank_level,
-            start,
-            "+",
-            aggregation_type="max",
-            bucket_size_msec=bucket_size,
-        )
-    ]
-
-
-def get_lowest_tank_level():
-    return min(l.value for l in get_tank_level(duration="all"))
+    if not duration:
+        return TankLevel(datetime.now(), 10.2)  # FIXME
+    hours, days, weeks = duration_to_args(duration)
+    start = datetime.now(pytz.UTC) - timedelta(hours=hours, days=days, weeks=weeks)
+    with CONN.cursor() as cursor:
+        cursor.execute(
+            "SELECT time_bucket(%s, time) AS bucket, max(level) FROM tank_level WHERE time > %s GROUP BY bucket ORDER BY bucket ASC",            
+            (BUCKETS[duration], start)
+        )        
+        return [TankLevel(row[0], row[1]) for row in cursor.fetchall()]
 
 
 def set_pump_amperage(amperage):
-    """
-    Sets the pump amperage in the db
-    """
-    amperage = float(amperage)
-    RTS.add(
-        Keys.pump_amperage,
-        "*",
-        amperage,
-    )
+    with CONN.cursor() as cursor:
+        cursor.execute("INSERT INTO pump_amperage (time, amperage) VALUES (now(), %s)", (amperage,))
+    CONN.commit()
     logger.info("Set amperage: %s", amperage)
 
 
-def get_pump_amperage(duration=None):
-    """
-    Gets the latest pump amperage, or a duration of amperages (from now)
-    """
-    if not RTS.get(Keys.pump_amperage):
-        logger.error("No pump amperage in database!")
-        return
-    if duration is None:
-        ts, v = RTS.get(Keys.pump_amperage)
-        return PumpAmperage(datetime.fromtimestamp(ts/1000.0), round(v, 2))
-    start, bucket_size = duration_to_start_and_bucket(duration)
-    return [
-        PumpAmperage(datetime.fromtimestamp(ts/1000.0), v)
-        for ts, v in RTS.range(
-            Keys.pump_amperage,
-            start,
-            "+",
-            aggregation_type="max",
-            bucket_size_msec=bucket_size,
-        )
-    ]
+def get_pump_amperage(duration=None):    
+    if not duration:
+        return PumpAmperage(datetime.now(), 10.2)  # FIXME
+    hours, days, weeks = duration_to_args(duration)
+    start = datetime.now(pytz.UTC) - timedelta(hours=hours, days=days, weeks=weeks)
+    with CONN.cursor() as cursor:
+        cursor.execute(
+            "SELECT time_bucket(%s, time) AS bucket, max(amperage) FROM pump_amperage WHERE time > %s GROUP BY bucket ORDER BY bucket ASC",
+            (BUCKETS[duration], start)
+        )        
+        return [PumpAmperage(row[0], row[1]) for row in cursor.fetchall()]
 
 
-def set_pump_ac_state(ac_state):
-    """
-    Sets a pump AC state (0/1)
-    """
-    RTS.add(
-        Keys.pump_ac_state,
-        "*",
-        ac_state,
-    )
-    logger.info("Set pump AC state: %s", ac_state)
-
-
-def get_pump_ac_state():
-    return RTS.get(Keys.pump_ac_state)  # FIXME, should return a class
+def set_pump_ac_state(state):
+    #with CONN.cursor() as cursor:
+    #    cursor.execute("INSERT INTO pump_amperage (time, amperage) VALUES (now(), %s)", (amperage,))
+    logger.info("Set pump AC state: %s", state)
 
 
 def status():
-    info = []
-    warn = []
-
-    try:
-        tank_level = get_tank_level()
-        tank_level_warn = get_tank_level_warn()
-        if tank_level.value > tank_level_warn:
-            warn.append("Tank Level Exceeded Max!")
-        else:
-            info.append("Tank Level OK")
-    except:
-        warn.append("Tank Level Data Unavailable")
-
-    try:
-        if int(get_pump_ac_state()[1]) == 1:
-            info.append("Pump Power OK")
-        else:
-            warn.append("Pump Power Loss!")
-    except:
-        warn.append("Pump Power State Unavailable!")
-
-
-    total, used, free = shutil.disk_usage(".")
-    used_percent = int(used / total * 100)
-    if used_percent > 90:
-        warn.append("Disk Usage Exceeded 90%!")
-    else:
-        info.append(f"Disk Usage OK ({used_percent}% used)")
-
     return {
-        "info": sorted(info),
-        "warn": sorted(warn),
+        "info": ["foo"],
+        "warn": ["bar"]
     }
-    

@@ -1,2 +1,6 @@
-REDIS_HOST=redis
 TZ=America/Winnipeg
+POSTGRES_HOST=db
+POSTGRES_USER=sepmon
+POSTGRES_PASSWORD=password
+POSTGRES_DB=sepmon
+
