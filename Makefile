@@ -1,14 +1,15 @@
 SHELL:=/bin/bash
 
 
-.PHONY: init docker-install docker-config fix-seccomp2 mock clean build-rest build-redis push-rest push-redis
+.PHONY: init docker-install docker-config fix-seccomp2 mock clean build-base build-redis push-base push-redis
 
 init:
 	sudo apt update
-	sudo apt -y install i2c-tools python3-venv python3-smbus python3-testresources python3-numpy python3-scipy
-	python3 -m venv --system-site-packages venv
+	sudo apt -y install i2c-tools python3-venv python3-smbus python3-testresources python3-numpy python3-scipy postgresql-client-common postgresql-client-*
+	python3 -m venv --clear --system-site-packages venv
 	./venv/bin/python -m pip install pip setuptools setuptools-rust wheel --upgrade --no-cache-dir
 	./venv/bin/python -m pip install --no-cache-dir -e .
+	./venv/bin/python -m pip install --no-cache-dir ansible
 
 docker-install:
 	sudo apt update
@@ -35,21 +36,24 @@ fix-seccomp2:
 
 
 clean:
-	@echo WARNING - this will delete the Redis database
+	@echo WARNING - this will delete database data
 	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
-	sudo rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
 	sudo find septic_monitor -type f -name "*.pyc" -delete
+	./venv/bin/docker-compose down
+	docker container prune -f
+	docker volume rm septic_monitor_pgdata; echo pgdata deleted		
+	sudo ./venv/bin/ansible-playbook ansible/fix-timescaledb-config.yml
 
 
-build-rest:
-	docker build -t erniesprojects/sepmon_rest -f Dockerfile.rest .
+build-base:
+	docker build -t erniesprojects/sepmon_base -f Dockerfile.base .
 
 build-redis:
 	docker build -t erniesprojects/sepmon_redis -f Dockerfile.redis .
 
 
-push-rest:
-	docker push erniesprojects/sepmon_rest
+push-base:
+	docker push erniesprojects/sepmon_base
 
 push-redis:
 	docker push erniesprojects/sepmon_redis
