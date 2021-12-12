@@ -68,7 +68,7 @@ for data_type in (TankLevel, PumpAmperage, PumpAcState):
         CONN.commit()
     with CONN.cursor() as cursor:
         try:        
-            cursor.execute(f"SELECT create_hypertable('data_type.table', 'time');")
+            cursor.execute(f"SELECT create_hypertable('{data_type.table}', 'time');")
             CONN.commit()
         except Exception as e:
             if not isinstance(e, DuplicateTable):
@@ -163,23 +163,23 @@ def status(short=False):
     try:
         if int(get_pump_ac_state()[1]) == 1:
             msg = "PWR OK" if short else "Pump Power OK"
-            info.append()
+            info.append(msg)
         else:
             msg = "PWR LOSS!" if short else "Pump Power Loss!"
             warn.append(msg)
     except:
         msg = "PWR?" if short else "Pump Power State Unavailable!"
-        warn.append()
+        warn.append(msg)
 
 
     total, used, free = shutil.disk_usage(".")
     used_percent = int(used / total * 100)
     if used_percent > 90:
         msg = "HD WARN!" if short else "Disk Usage Exceeded 90%!"
-        warn.append()
+        warn.append(msg)
     else:
         msg = "HD OK" if short else f"Disk Usage OK ({used_percent}% used)"
-        info.append()
+        info.append(msg)
 
     return {
         "info": sorted(info),
