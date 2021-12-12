@@ -10,6 +10,8 @@ init:
 	./venv/bin/python -m pip install pip setuptools setuptools-rust wheel --upgrade --no-cache-dir
 	./venv/bin/python -m pip install --no-cache-dir -e .
 	./venv/bin/python -m pip install --no-cache-dir ansible
+	echo -e '\nsource .env' >> venv/bin/activate
+	test -f .env || cp .env.sample .env
 
 docker-install:
 	sudo apt update

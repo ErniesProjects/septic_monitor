@@ -61,20 +61,21 @@ class PumpAcState:
 for data_type in (TankLevel, PumpAmperage, PumpAcState):
     with CONN.cursor() as cursor:
         try:
-            cursor.execute(f"CREATE TABLE {data_type.table} (time TIMESTAMPTZ NOT NULL, value DOUBLE PRECISION);")
+            cursor.execute(f"CREATE TABLE IF NOT EXISTS {data_type.table} (time TIMESTAMPTZ NOT NULL, value DOUBLE PRECISION);")            
         except Exception as e:
-            if not isinstance(e, DuplicateTable):
-                print(e)
-        CONN.commit()
+            print(e)
+        finally:
+            CONN.commit()
+        
+
     with CONN.cursor() as cursor:
         try:        
-            cursor.execute(f"SELECT create_hypertable('{data_type.table}', 'time');")
-            CONN.commit()
+            cursor.execute(f"SELECT create_hypertable('{data_type.table}', 'time');")            
         except Exception as e:
-            if not isinstance(e, DuplicateTable):
-                print(e)    
-        CONN.commit()
-
+            print(e)    
+        finally:
+            CONN.commit()
+        
 
 BUCKETS = {
     "hour": "2 minutes",
@@ -121,6 +122,10 @@ def set_tank_level(level):
 
 def get_tank_level(duration=None):
     return get_ts_data(TankLevel, duration=duration)
+
+
+def get_tank_level_warn():
+    return os.environ["TANK_LEVEL_WARN"]
     
 
 def set_pump_amperage(amperage):
@@ -133,12 +138,15 @@ def get_pump_amperage(duration=None):
     
 
 def set_pump_ac_state(state):
+    state = int(state)
     set_ts_data(PumpAcState, state)
     logger.info("Set pump AC state: %s", state)
 
 
 def get_pump_ac_state():
-    return get_ts_data(PumpAcState, duration=None)    
+    ac_state = get_ts_data(PumpAcState, duration=None)
+    ac_state.value = int(ac_state.value)
+    return ac_state
 
 
 
@@ -155,18 +163,20 @@ def status(short=False):
         else:
             msg = "LVL OK" if short else "Tank Level OK"
             info.append(msg)
-    except:
+    except Exception as e:
+        logger.error("Error getting level data: %s", e)
         msg = "LVL?" if short else "Tank Level Data Unavailable"
         warn.append(msg)
 
     try:
-        if int(get_pump_ac_state()[1]) == 1:
+        if int(get_pump_ac_state().value) == 1:
             msg = "PWR OK" if short else "Pump Power OK"
             info.append(msg)
         else:
             msg = "PWR LOSS!" if short else "Pump Power Loss!"
             warn.append(msg)
-    except:
+    except Exception as e:
+        logger.error("Error getting AC state: %s", e)
         msg = "PWR?" if short else "Pump Power State Unavailable!"
         warn.append(msg)
 
