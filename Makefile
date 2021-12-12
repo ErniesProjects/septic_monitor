@@ -1,7 +1,7 @@
 SHELL:=/bin/bash
 
 
-.PHONY: init docker-install docker-config fix-seccomp2 mock clean build-base build-redis push-base push-redis
+.PHONY: init docker-install docker-config fix-seccomp2 mock clean build-base push-base
 
 init:
 	sudo apt update
@@ -37,7 +37,7 @@ fix-seccomp2:
 	rm libseccomp2_2.5.1-1_armhf.deb -f
 
 
-clean:
+clean-db:
 	@echo WARNING - this will delete database data
 	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
 	sudo find septic_monitor -type f -name "*.pyc" -delete
@@ -47,23 +47,24 @@ clean:
 	sudo ./venv/bin/ansible-playbook ansible/fix-timescaledb-config.yml
 
 
+clean-docker:
+	@echo WARNING - this will delete database data
+	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
+	./venv/bin/docker-compose down
+	docker container prune -f
+	docker image prune -a -f
+	docker volume prune -f
+	docker system prune -a -f
+	
+
 build-base:
 	docker build -t erniesprojects/sepmon_base -f Dockerfile.base .
-
-build-redis:
-	docker build -t erniesprojects/sepmon_redis -f Dockerfile.redis .
 
 
 push-base:
 	docker push erniesprojects/sepmon_base
 
-push-redis:
-	docker push erniesprojects/sepmon_redis
-
 
 mock:
 	sudo apt -y install python3-numpy python3-scipy
 	./venv/bin/python septic_monitor/mock.py
-
-
-
