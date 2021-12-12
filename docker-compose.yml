@@ -9,8 +9,8 @@ services:
     restart: unless-stopped
   rest:
     image: erniesprojects/sepmon_base
-    command: ["uvicorn", "septic_monitor.rest:app", "--host", "0.0.0.0", "--port", "80"]    
-    env_file: .env    
+    command: ["uvicorn", "septic_monitor.rest:app", "--host", "0.0.0.0", "--port", "80"]
+    env_file: .env
     volumes:
     - "./septic_monitor:/opt/sm/septic_monitor"
     - "/etc/timezone:/etc/timezone"
@@ -19,7 +19,7 @@ services:
     - "db"
   nginx:
     image: nginx
-    env_file: .env    
+    env_file: .env
     volumes:
     - "./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro"
     - "./web:/usr/share/nginx/html:ro"
@@ -30,7 +30,7 @@ services:
     - "rest"
   pump_v:
     image: erniesprojects/sepmon_base
-    env_file: .env    
+    env_file: .env
     volumes:
     - "./septic_monitor:/opt/sm/septic_monitor"
     - "/etc/timezone:/etc/timezone"
@@ -39,7 +39,18 @@ services:
     command: ["python", "/opt/sm/septic_monitor/pump_v.py"]
     depends_on:
     - "db"
-  
+  pump_i:
+    image: erniesprojects/sepmon_base
+    volumes:
+    - "./septic_monitor:/opt/sm/septic_monitor"
+    - "/etc/timezone:/etc/timezone"
+    env_file: .env
+    restart: unless-stopped
+    privileged: true
+    command: ["python", "/opt/sm/septic_monitor/pump_i.py"]
+    depends_on:
+    - "db"
+
 
 volumes:
   pgdata:
