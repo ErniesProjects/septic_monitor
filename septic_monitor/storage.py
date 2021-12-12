@@ -121,6 +121,7 @@ def set_tank_level(level):
 
 
 def get_tank_level(duration=None):
+    return TankLevel(datetime.now(), -10.2)  # FIXME
     return get_ts_data(TankLevel, duration=duration)
 
 
