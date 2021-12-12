@@ -1,5 +1,4 @@
-appendonly.aof
-dump.rdb
+.env
 .htpasswd
 .vscode
 .idea

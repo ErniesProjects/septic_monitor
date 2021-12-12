@@ -1,14 +1,17 @@
 SHELL:=/bin/bash
 
 
-.PHONY: init docker-install docker-config fix-seccomp2 mock clean build-rest build-redis push-rest push-redis
+.PHONY: init docker-install docker-config fix-seccomp2 mock clean build-base push-base
 
 init:
 	sudo apt update
-	sudo apt -y install i2c-tools python3-venv python3-smbus python3-testresources python3-numpy python3-scipy
-	python3 -m venv --system-site-packages venv
+	sudo apt -y install i2c-tools python3-venv python3-smbus python3-testresources python3-numpy python3-scipy postgresql-client-common postgresql-client-*
+	python3 -m venv --clear --system-site-packages venv
 	./venv/bin/python -m pip install pip setuptools setuptools-rust wheel --upgrade --no-cache-dir
 	./venv/bin/python -m pip install --no-cache-dir -e .
+	./venv/bin/python -m pip install --no-cache-dir ansible
+	echo -e '\nsource .env' >> venv/bin/activate
+	test -f .env || cp .env.sample .env
 
 docker-install:
 	sudo apt update
@@ -34,30 +37,34 @@ fix-seccomp2:
 	rm libseccomp2_2.5.1-1_armhf.deb -f
 
 
-clean:
-	@echo WARNING - this will delete the Redis database
+clean-db:
+	@echo WARNING - this will delete database data
 	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
-	sudo rm ./redis/data/appendonly.aof ./redis/data/dump.rdb -f
 	sudo find septic_monitor -type f -name "*.pyc" -delete
+	./venv/bin/docker-compose down
+	docker container prune -f
+	docker volume rm septic_monitor_pgdata; echo pgdata deleted		
+	sudo ./venv/bin/ansible-playbook ansible/fix-timescaledb-config.yml
 
 
-build-rest:
-	docker build -t erniesprojects/sepmon_rest -f Dockerfile.rest .
+clean-docker:
+	@echo WARNING - this will delete database data
+	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
+	./venv/bin/docker-compose down
+	docker container prune -f
+	docker image prune -a -f
+	docker volume prune -f
+	docker system prune -a -f
+	
 
-build-redis:
-	docker build -t erniesprojects/sepmon_redis -f Dockerfile.redis .
+build-base:
+	docker build -t erniesprojects/sepmon_base -f Dockerfile.base .
 
 
-push-rest:
-	docker push erniesprojects/sepmon_rest
-
-push-redis:
-	docker push erniesprojects/sepmon_redis
+push-base:
+	docker push erniesprojects/sepmon_base
 
 
 mock:
 	sudo apt -y install python3-numpy python3-scipy
 	./venv/bin/python septic_monitor/mock.py
-
-
-
