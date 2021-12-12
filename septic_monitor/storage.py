@@ -125,7 +125,7 @@ def get_tank_level(duration=None):
 
 
 def get_tank_level_warn():
-    return os.environ["TANK_LEVEL_WARN"]
+    return int(0 - int(os.environ["TANK_LEVEL_WARN"]))
     
 
 def set_pump_amperage(amperage):
