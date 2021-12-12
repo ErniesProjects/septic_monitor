@@ -7,6 +7,8 @@
     async: 300
     poll: 0
     register: db_log
+    args:
+      chdir: "{{ playbook_dir }}/../"
 
 
   - slurp:
@@ -37,6 +39,9 @@
       regexp: '.*timescaledb.telemetry_level.*'
 
   - shell: "{{ playbook_dir }}/../venv/bin/docker-compose down"
+    args:
+      chdir: "{{ playbook_dir }}/../"
+
 
   - file:
       path: /tmp/db.log
