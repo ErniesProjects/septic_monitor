@@ -95,9 +95,8 @@ def duration_to_args(duration):
 def get_ts_data(data_type, duration=None):
     if not duration:
         with CONN.cursor() as cursor:
-            cursor.execute(f"SELECT (time, value) FROM {data_type.table} ORDER BY time DESC LIMIT 1")
-            for row in cursor.fetchall():
-                return PumpAmperage(row[0], row[1])
+            cursor.execute(f"SELECT time, value FROM {data_type.table} ORDER BY time DESC LIMIT 1")            
+            return data_type(*cursor.fetchone())
     hours, days, weeks = duration_to_args(duration)
     start = datetime.now(pytz.UTC) - timedelta(hours=hours, days=days, weeks=weeks)
     with CONN.cursor() as cursor:
