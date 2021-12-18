@@ -43,7 +43,9 @@ def main():
 
     while True:
         storage.set_tank_level(random.choice(range(20, 40)))
-        storage.set_pump_amperage(random.choice(range(1, 14)))
+        storage.set_pump_amperage(random.choice(
+            [0,] * 30 + [random.choice(range(11, 13)),]
+        ))
         time.sleep(15)
 
 

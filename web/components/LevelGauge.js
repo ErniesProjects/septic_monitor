@@ -73,9 +73,9 @@ export default Vue.component('LevelGauge', {
                     }
                 },
                 scales: {
-                    yAxes: [{
+                    y: {
                         ticks: {min: -40, max: 0}
-                    }]
+                    }
                 }
             }
         });  // this.chart

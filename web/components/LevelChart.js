@@ -61,7 +61,7 @@ export default Vue.component('LevelChart', {
             },
             options: {
                 scales: {
-                    xAxis: {
+                    x: {
                         type: 'time',
                     }
                 },

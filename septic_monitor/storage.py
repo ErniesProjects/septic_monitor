@@ -1,5 +1,6 @@
 import logging
 import os
+import random
 import shutil
 import subprocess
 import sys
@@ -78,8 +79,8 @@ for data_type in (TankLevel, PumpAmperage, PumpAcState):
         
 
 BUCKETS = {
-    "hour": "2 minutes",
-    "day": "20 minutes",
+    "hour": "1 minutes",
+    "day": "30 minutes",
     "week": "1 hours",
     "month": "1 hours",
 }
@@ -94,7 +95,7 @@ def duration_to_args(duration):
 
 
 def get_ts_data(data_type, duration=None):
-    if not duration:
+    if duration is None:
         with CONN.cursor() as cursor:
             cursor.execute(f"SELECT time, value FROM {data_type.table} ORDER BY time DESC LIMIT 1")            
             return data_type(*cursor.fetchone())
@@ -121,7 +122,8 @@ def set_tank_level(level):
 
 
 def get_tank_level(duration=None):
-    return TankLevel(datetime.now(), -10.2)  # FIXME
+    if duration is None:
+        return TankLevel(datetime.now(), random.randint(-20, -7))  # FIXME
     return get_ts_data(TankLevel, duration=duration)
 
 
