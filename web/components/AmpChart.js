@@ -41,7 +41,7 @@ export default Vue.component('AmpChart', {
                         label: "Pump Amperage",
                         data: this.amperages,
                         borderColor: this.colorLine,
-                        tension: 0.1,
+                        tension: 0.4,
                         fill: "start",
                     },
                     {
@@ -55,6 +55,11 @@ export default Vue.component('AmpChart', {
             },
             options: {
                 scaleBeginAtZero: true,
+                elements: {
+                    point: {
+                    	radius: 0
+                    }	
+                },
                 scales: {
                     x: {
                         type: 'time',
