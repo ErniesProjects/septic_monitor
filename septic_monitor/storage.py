@@ -80,18 +80,20 @@ for data_type in (TankLevel, PumpAmperage, PumpAcState):
 
 BUCKETS = {
     "hour": "1 minutes",
-    "day": "30 minutes",
-    "week": "1 hours",
+    "day": "1 minutes",
+    "week": "5 minutes",
     "month": "1 hours",
 }
 
 
-def duration_to_args(duration):
-    hours = 1 if duration == "hour" else 0
-    days = 1 if duration == "day" else 0
-    weeks = 1 if duration == "week" else 0
-    weeks = 4 if duration == "month" else 0
-    return hours, days, weeks
+# hrs, days, weeks
+DURATION_TO_ARGS = {
+    "hour": (1,0,0),
+    "day": (0,1,0),
+    "week": (0,0,1),
+    "month": (0,0,4),
+}
+    
 
 
 def get_ts_data(data_type, duration=None):
@@ -99,7 +101,7 @@ def get_ts_data(data_type, duration=None):
         with CONN.cursor() as cursor:
             cursor.execute(f"SELECT time, value FROM {data_type.table} ORDER BY time DESC LIMIT 1")            
             return data_type(*cursor.fetchone())
-    hours, days, weeks = duration_to_args(duration)
+    hours, days, weeks = DURATION_TO_ARGS[duration]
     start = datetime.now(pytz.UTC) - timedelta(hours=hours, days=days, weeks=weeks)
     with CONN.cursor() as cursor:
         cursor.execute(

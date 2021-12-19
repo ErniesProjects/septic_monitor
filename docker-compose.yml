@@ -17,6 +17,7 @@ services:
     restart: unless-stopped
     depends_on:
     - "db"
+    - "nginx"
   nginx:
     image: nginx
     env_file: .env
@@ -26,8 +27,6 @@ services:
     ports:
     - "80:80"
     restart: unless-stopped
-    depends_on:
-    - "rest"
   pump_v:
     image: erniesprojects/sepmon_base
     env_file: .env

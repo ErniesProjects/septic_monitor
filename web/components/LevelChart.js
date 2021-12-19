@@ -42,7 +42,7 @@ export default Vue.component('LevelChart', {
                         label: "Water Level",
                         data: this.levels,
                         borderColor: this.colorLine,
-                        tension: 0.4,
+                        tension: 0.1,
                         fill: "start",
                     },
                     {
@@ -64,7 +64,8 @@ export default Vue.component('LevelChart', {
                     point: {
                     	radius: 0
                     }	
-                },            
+                },
+
                 scales: {
                     x: {
                         type: 'time',

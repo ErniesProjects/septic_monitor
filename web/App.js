@@ -55,13 +55,11 @@ new Vue({
                             <v-card-title>Tank Levels</v-card-title>
                             <v-card-text>
                                 <v-tabs v-model="levelTabs">
-                                    <v-tab>Hour</v-tab>
                                     <v-tab>Day</v-tab>
                                     <v-tab>Week</v-tab>
                                     <v-tab>Month</v-tab>
                                 </v-tabs>
-                                <v-tabs-items v-model="levelTabs">
-                                    <v-tab-item><LevelChart duration="hour"></LevelChart></v-tab-item>
+                                <v-tabs-items v-model="levelTabs">                                    
                                     <v-tab-item><LevelChart duration="day"></LevelChart></v-tab-item>
                                     <v-tab-item><LevelChart duration="week"></LevelChart></v-tab-item>
                                     <v-tab-item><LevelChart duration="month"></LevelChart></v-tab-item>
@@ -69,19 +67,18 @@ new Vue({
                             </v-card-text>
                         </v-card>
                     </v-col>
-                    
+                </v-row>
+               	<v-row>    
                     <v-col>
                         <v-card shaped outlined height="100%">
                             <v-card-title>Pump Amperage</v-card-title>
                             <v-card-text>
-                                <v-tabs v-model="ampTabs">
-                                    <v-tab>Hour</v-tab>
+                                <v-tabs v-model="ampTabs">                       
                                     <v-tab>Day</v-tab>
                                     <v-tab>Week</v-tab>
                                     <v-tab>Month</v-tab>
                                 </v-tabs>
-                                <v-tabs-items v-model="ampTabs">                                
-                                    <v-tab-item><AmpChart duration="hour"></AmpChart></v-tab-item>
+                                <v-tabs-items v-model="ampTabs">                                    
                                     <v-tab-item><AmpChart duration="day"></AmpChart></v-tab-item>
                                     <v-tab-item><AmpChart duration="week"></AmpChart></v-tab-item>
                                     <v-tab-item><AmpChart duration="month"></AmpChart></v-tab-item>                                
