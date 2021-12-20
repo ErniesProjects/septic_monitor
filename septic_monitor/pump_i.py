@@ -36,6 +36,7 @@ def pump_current_callback(channel):
 
     PUMP_STATE = 1
     storage.set_pump_amperage(0.0)
+    time.sleep(5)  #Delay start to eliminate surge current in pump motor reading
 
     while PUMP_STATE == 1:
         PUMP_STATE = GPIO.input(PUMP_RUNNING_GPIO)
