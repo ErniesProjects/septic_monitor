@@ -6,6 +6,7 @@ install_requires = [
     "docker-compose",
     "fastapi",
     "psycopg2",
+    "pyserial",
     "pytz",    
     "RPi.GPIO",
     "RPLCD",

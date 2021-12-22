@@ -27,15 +27,18 @@ POSTGRES_DB = os.getenv("POSTGRES_DB")
 
 while True:
     time.sleep(5)
-    p = subprocess.run(["pg_isready", "-h", POSTGRES_HOST, "-U", POSTGRES_USER, "-d", POSTGRES_DB], capture_output=True)
+    p = subprocess.run(
+        ["pg_isready", "-h", POSTGRES_HOST, "-U", POSTGRES_USER, "-d", POSTGRES_DB],
+        capture_output=True,
+    )
     if p.returncode == 0:
         break
     logger.warning("Database not ready...")
-    
-    
 
-CONN = psycopg2.connect(f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DB}")
 
+CONN = psycopg2.connect(
+    f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DB}"
+)
 
 
 @attrs
@@ -58,25 +61,33 @@ class PumpAcState:
     value = attrib()
     table = "pump_ac_state"
 
-        
-for data_type in (TankLevel, PumpAmperage, PumpAcState):
+
+@attrs
+class DiskUsage:
+    timestamp = attrib()
+    value = attrib()
+    table = "disk_usage"
+
+
+for data_type in (TankLevel, PumpAmperage, PumpAcState, DiskUsage):
     with CONN.cursor() as cursor:
         try:
-            cursor.execute(f"CREATE TABLE IF NOT EXISTS {data_type.table} (time TIMESTAMPTZ NOT NULL, value DOUBLE PRECISION);")            
+            cursor.execute(
+                f"CREATE TABLE IF NOT EXISTS {data_type.table} (time TIMESTAMPTZ NOT NULL, value DOUBLE PRECISION);"
+            )
         except Exception as e:
             print(e)
         finally:
             CONN.commit()
-        
 
     with CONN.cursor() as cursor:
-        try:        
-            cursor.execute(f"SELECT create_hypertable('{data_type.table}', 'time');")            
+        try:
+            cursor.execute(f"SELECT create_hypertable('{data_type.table}', 'time');")
         except Exception as e:
-            print(e)    
+            print(e)
         finally:
             CONN.commit()
-        
+
 
 BUCKETS = {
     "hour": "1 minutes",
@@ -88,32 +99,35 @@ BUCKETS = {
 
 # hrs, days, weeks
 DURATION_TO_ARGS = {
-    "hour": (1,0,0),
-    "day": (0,1,0),
-    "week": (0,0,1),
-    "month": (0,0,4),
+    "hour": (1, 0, 0),
+    "day": (0, 1, 0),
+    "week": (0, 0, 1),
+    "month": (0, 0, 4),
 }
-    
 
 
 def get_ts_data(data_type, duration=None):
     if duration is None:
         with CONN.cursor() as cursor:
-            cursor.execute(f"SELECT time, value FROM {data_type.table} ORDER BY time DESC LIMIT 1")            
+            cursor.execute(
+                f"SELECT time, value FROM {data_type.table} ORDER BY time DESC LIMIT 1"
+            )
             return data_type(*cursor.fetchone())
     hours, days, weeks = DURATION_TO_ARGS[duration]
     start = datetime.now(pytz.UTC) - timedelta(hours=hours, days=days, weeks=weeks)
     with CONN.cursor() as cursor:
         cursor.execute(
             f"SELECT time_bucket(%s, time) AS bucket, max(value) FROM {data_type.table} WHERE time > %s GROUP BY bucket ORDER BY bucket ASC",
-            (BUCKETS[duration], start)
-        )        
+            (BUCKETS[duration], start),
+        )
         return [data_type(row[0], row[1]) for row in cursor.fetchall()]
 
 
-def set_ts_data(data_type, value):    
+def set_ts_data(data_type, value):
     with CONN.cursor() as cursor:
-        cursor.execute(f"INSERT INTO {data_type.table} (time, value) VALUES (now(), %s)", (value,))
+        cursor.execute(
+            f"INSERT INTO {data_type.table} (time, value) VALUES (now(), %s)", (value,)
+        )
     CONN.commit()
 
 
@@ -131,7 +145,7 @@ def get_tank_level(duration=None):
 
 def get_tank_level_warn():
     return int(0 - int(os.environ["TANK_LEVEL_WARN"]))
-    
+
 
 def set_pump_amperage(amperage):
     set_ts_data(PumpAmperage, amperage)
@@ -140,7 +154,7 @@ def set_pump_amperage(amperage):
 
 def get_pump_amperage(duration=None):
     return get_ts_data(PumpAmperage, duration=duration)
-    
+
 
 def set_pump_ac_state(state):
     state = int(state)
@@ -154,6 +168,14 @@ def get_pump_ac_state():
     return ac_state
 
 
+def set_disk_usage(usage):
+    set_ts_data(DiskUsage, usage)
+    logger.info("Set disk usage: %s", usage)
+
+
+def get_disk_usage():
+    return get_ts_data(DiskUsage, duration=None)
+
 
 def status(short=False):
     info = []
@@ -163,7 +185,7 @@ def status(short=False):
         tank_level = get_tank_level()
         tank_level_warn = get_tank_level_warn()
         if tank_level.value > tank_level_warn:
-            msg = "LVL WARN!" if short else "Tank Level Exceeded Max!" 
+            msg = "LVL WARN!" if short else "Tank Level Exceeded Max!"
             warn.append(msg)
         else:
             msg = "LVL OK" if short else "Tank Level OK"
@@ -184,7 +206,6 @@ def status(short=False):
         logger.error("Error getting AC state: %s", e)
         msg = "PWR?" if short else "Pump Power State Unavailable!"
         warn.append(msg)
-
 
     total, used, free = shutil.disk_usage(".")
     used_percent = int(used / total * 100)

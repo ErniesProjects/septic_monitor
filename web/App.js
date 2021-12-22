@@ -50,24 +50,7 @@ new Vue({
                     <v-col><AmpGauge></AmpGauge></v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
-                        <v-card shaped outlined height="100%">
-                            <v-card-title>Tank Levels</v-card-title>
-                            <v-card-text>
-                                <v-tabs v-model="levelTabs">
-                                    <v-tab>Day</v-tab>
-                                    <v-tab>Week</v-tab>
-                                    <v-tab>Month</v-tab>
-                                </v-tabs>
-                                <v-tabs-items v-model="levelTabs">                                    
-                                    <v-tab-item><LevelChart duration="day"></LevelChart></v-tab-item>
-                                    <v-tab-item><LevelChart duration="week"></LevelChart></v-tab-item>
-                                    <v-tab-item><LevelChart duration="month"></LevelChart></v-tab-item>
-                                </v-tabs-items>                                
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                </v-row>
+                  <iframe src="http://192.168.2.153:8080/d-solo/1zhwXOZRz/main-dashboard?orgId=1&panelId=2" width="450" height="200" frameborder="0"></iframe>                </v-row>
                	<v-row>    
                     <v-col>
                         <v-card shaped outlined height="100%">
