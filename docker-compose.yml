@@ -1,12 +1,4 @@
 services:
-  grafana:
-    image: "grafana/grafana-oss"
-    env_file: .env
-    volumes:
-    - "grafana-storage:/var/lib/grafana"
-    restart: unless-stopped
-    depends_on:
-    - "db"
   db:
     image: "timescale/timescaledb:latest-pg12"
     env_file: .env
@@ -15,6 +7,14 @@ services:
     volumes:
     - "pgdata:/var/lib/postgresql/data"
     restart: unless-stopped
+  grafana:
+    image: "grafana/grafana-oss"
+    env_file: .env
+    volumes:
+    - "grafana-storage:/var/lib/grafana"
+    restart: unless-stopped
+    depends_on:
+    - "db"
   nginx:
     image: nginx
     env_file: .env
@@ -50,6 +50,18 @@ services:
     command: ["python", "/opt/sm/septic_monitor/pump_i.py"]
     depends_on:
     - "db"
+  host:
+    image: erniesprojects/sepmon_base
+    volumes:
+    - "./septic_monitor:/opt/sm/septic_monitor"
+    - "/etc/timezone:/etc/timezone"
+    env_file: .env
+    restart: unless-stopped
+    privileged: true
+    command: ["python", "/opt/sm/septic_monitor/host.py"]
+    depends_on:
+    - "db"
+
 
 
 volumes:

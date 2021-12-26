@@ -72,7 +72,7 @@
       },
       "id": 10,
       "panels": [],
-      "title": "STATS",
+      "title": "STATUS",
       "type": "row"
     },
     {
@@ -103,7 +103,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 7,
+        "w": 6,
         "x": 0,
         "y": 1
       },
@@ -120,6 +120,7 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "auto"
       },
       "pluginVersion": "8.3.3",
@@ -161,92 +162,17 @@
       "type": "stat"
     },
     {
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "blue",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": -5
-              },
-              {
-                "color": "red",
-                "value": 0
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
+      "collapsed": false,
       "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 7,
-        "y": 1
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
       },
-      "id": 6,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.3.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "${DS_POSTGRESQL}"
-          },
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT value,time FROM tank_level ORDER BY time DESC LIMIT 1;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "disk_usage",
-          "timeColumn": "\"time\"",
-          "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
-        }
-      ],
-      "title": "Current Tank Level",
-      "type": "stat"
+      "id": 16,
+      "panels": [],
+      "title": "PUMP",
+      "type": "row"
     },
     {
       "fieldConfig": {
@@ -293,9 +219,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 7,
-        "x": 13,
-        "y": 1
+        "w": 6,
+        "x": 0,
+        "y": 10
       },
       "id": 12,
       "options": {
@@ -352,19 +278,6 @@
       "type": "stat"
     },
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 9
-      },
-      "id": 8,
-      "panels": [],
-      "title": "CHARTS",
-      "type": "row"
-    },
-    {
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -415,8 +328,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 24,
-        "x": 0,
+        "w": 18,
+        "x": 6,
         "y": 10
       },
       "id": 4,
@@ -466,6 +379,108 @@
       ],
       "title": "Pump Amperage",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 18,
+      "panels": [],
+      "title": "TANK",
+      "type": "row"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": -5
+              },
+              {
+                "color": "red",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 19
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRESQL}"
+          },
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT value,time FROM tank_level ORDER BY time DESC LIMIT 1;",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "disk_usage",
+          "timeColumn": "\"time\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Current Tank Level",
+      "type": "stat"
     },
     {
       "description": "",
@@ -526,10 +541,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 18
+        "h": 8,
+        "w": 18,
+        "x": 6,
+        "y": 19
       },
       "id": 2,
       "options": {
@@ -580,7 +595,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "30s",
+  "refresh": "",
   "schemaVersion": 34,
   "style": "dark",
   "tags": [],
@@ -588,13 +603,13 @@
     "list": []
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "SepMon",
   "uid": "YJi535ZRk",
-  "version": 15,
+  "version": 27,
   "weekStart": ""
 }
