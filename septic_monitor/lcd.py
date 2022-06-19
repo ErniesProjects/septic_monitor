@@ -38,8 +38,8 @@ while True:
     lcd.cursor_pos = Cursor.date
     lcd.write_string(time.strftime("%Y-%m-%d"))
 
-#    lcd.cursor_pos = Cursor.level
-#    level = storage.get_tank_level()
-#    lcd.write_string(f"Level: {level:.1f} cm")
+    lcd.cursor_pos = Cursor.level
+    level = storage.get_tank_level()
+    lcd.write_string(f"Level: {level.value:.1f} cm")
 
     time.sleep(1)

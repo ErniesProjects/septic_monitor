@@ -28,7 +28,7 @@ SER = serial.Serial(
 def get_distance():
     distances = list()
     for i in range(NUM_READINGS):
-        SER.write(b"\xff")  # request data
+        SER.write(b"\x55")  # request data
         frame = SER.read(4)  # read a 4 byte frame
         header, high, low, checksum = struct.unpack("BBBB", frame)
         if header != 0xFF:
@@ -48,7 +48,7 @@ def get_distance():
 
 def main():
     while True:
-        distance = get_distance()
+        distance = get_distance() / 10.0
         storage.set_tank_level(distance)  # storage will ensure this is a correct level
         logger.info("Distance: %d cm", distance)
         time.sleep(POLL_INTERVAL)
