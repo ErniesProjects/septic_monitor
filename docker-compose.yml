@@ -27,7 +27,7 @@ services:
     - "443:443"
     restart: unless-stopped
     depends_on:
-    - "grafana"    
+    - "grafana"
   pump_v:
     image: erniesprojects/sepmon_base
     env_file: .env
@@ -48,6 +48,17 @@ services:
     restart: unless-stopped
     privileged: true
     command: ["python", "/opt/sm/septic_monitor/pump_i.py"]
+    depends_on:
+    - "db"
+  ultrasonic:
+    image: erniesprojects/sepmon_base
+    volumes:
+    - "./septic_monitor:/opt/sm/septic_monitor"
+    - "/etc/timezone:/etc/timezone"
+    env_file: .env
+    restart: unless-stopped
+    privileged: true
+    command: ["python", "/opt/sm/septic_monitor/ultrasonic.py"]
     depends_on:
     - "db"
   host:
