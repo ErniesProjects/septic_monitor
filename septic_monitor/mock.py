@@ -1,17 +1,23 @@
+import io
 import itertools
+import json
 import logging
 import random
 import sys
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
+import boto3
 import numpy as np
 from scipy import signal
 
-from septic_monitor import storage
+#from septic_monitor import storage
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+S3 = boto3.resource('s3')
 
 
 def back_data():
@@ -26,11 +32,28 @@ def main():
         back_data()
 
     while True:
-        storage.set_tank_level(40 - (4 * datetime.now().weekday()))
-        storage.set_pump_amperage(random.choice(
-            [0,] * 30 + [random.choice(range(11, 13)),]
-        ))
-        time.sleep(60)
+        #storage.set_tank_level(40 - (4 * datetime.now().weekday()))
+        #storage.set_pump_amperage(random.choice(
+        #    [0,] * 30 + [random.choice(range(11, 13)),]
+        #))
+        messages = []
+        warnings = []
+        tank_level = 0 - random.randint(10,30)
+        if tank_level > -20:
+            warnings.append(f"Tank Level: {tank_level} cm")
+        else:
+            messages.append(f"Tank Level: {tank_level} cm")
+        status = {
+          "timestamp": int(datetime.now(timezone.utc).timestamp()),
+          "messages": messages,
+          "warnings": warnings,
+        }
+        logger.info(status)
+        s_io = io.BytesIO(json.dumps(status).encode())
+        S3.meta.client.upload_fileobj(s_io, 'septic-monitor', 'status.json', ExtraArgs={'ACL':'public-read'})
+        with open("dashboard/status.json", "w") as f:
+            f.write(json.dumps(status))
+        time.sleep(60*5)
 
 
 if __name__ == "__main__":

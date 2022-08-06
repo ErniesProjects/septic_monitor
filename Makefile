@@ -3,6 +3,19 @@ SHELL:=/bin/bash
 
 .PHONY: init docker-install docker-config fix-seccomp2 mock clean build-base push-base
 
+help:
+	@echo init
+	@echo docker-install
+	@echo docker-config
+	@echo fix-seccomp2
+	@echo clean-db
+	@echo clean-docker
+	@echo build-base
+	@echo push-base
+	@echo mock
+	@echo cp-index
+
+
 init:
 	sudo apt update
 	sudo apt -y install i2c-tools python3-venv python3-smbus python3-testresources python3-numpy python3-scipy postgresql-client-common postgresql-client-*
@@ -43,7 +56,7 @@ clean-db:
 	sudo find septic_monitor -type f -name "*.pyc" -delete
 	./venv/bin/docker-compose down
 	docker container prune -f
-	docker volume rm septic_monitor_pgdata; echo pgdata deleted		
+	docker volume rm septic_monitor_pgdata; echo pgdata deleted
 	sudo ./venv/bin/ansible-playbook ansible/fix-timescaledb-config.yml
 
 
@@ -55,7 +68,7 @@ clean-docker:
 	docker image prune -a -f
 	docker volume prune -f
 	docker system prune -a -f
-	
+
 
 build-base:
 	docker build -t erniesprojects/sepmon_base -f Dockerfile.base .
@@ -66,5 +79,11 @@ push-base:
 
 
 mock:
-	sudo apt -y install python3-numpy python3-scipy
+#	sudo apt -y install python3-numpy python3-scipy
 	./venv/bin/python septic_monitor/mock.py
+
+
+.PHONY: cp-index
+cp-index:
+	aws s3 cp ./dashboard/index.html s3://septic-monitor/index.html
+	aws s3api put-object-acl --bucket septic-monitor --key index.html --acl public-read
